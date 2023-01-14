@@ -3,7 +3,7 @@
 <template>
   <main>
     <div class="MainPost"   v-for="i in 10" :key="i" >
-      <router-link to="/Detail" style="text-decoration: none; width: 100%;">
+      <router-link to="/home/detail" style="text-decoration: none; width: 100%;">
         <div class="PostInfo">
           <div class="postImg">
             <img src="@/assets/dtt/house.png" alt="" class="houseImg" />
