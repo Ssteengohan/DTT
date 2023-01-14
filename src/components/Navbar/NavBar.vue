@@ -48,7 +48,7 @@ import { RouterLink, RouterView } from "vue-router";
 </template>
 
 <style>
-@media (min-width: 751px) {
+@media (min-width: 750px) {
   .mobile-wrapper {
     display: none;
   }
