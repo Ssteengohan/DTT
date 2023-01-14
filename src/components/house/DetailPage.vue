@@ -82,6 +82,9 @@
   </main>
 </template>
 <style scoped>
+a.router-link-exact-active {
+  color: var(--primary-text);
+}
 .MainDetail {
   display: flex;
   flex-direction: column;
