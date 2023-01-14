@@ -36,7 +36,6 @@
   cursor: pointer;
   background-color: var(--background2);
   width: 70%;
-
   margin-top: 20px;
   margin-left: 20%;
   border-radius: 10px;
@@ -60,7 +59,6 @@
 .PostDetail {
   flex: 1;
   margin-left: 20px;
-  width: fit-content;
 }
 
 .street {
@@ -68,6 +66,7 @@
   color: var(--primary-text);
   font-weight: 700;
   font-size: 18px;
+  margin-top: 0px;
 }
 
 .housePrice,
