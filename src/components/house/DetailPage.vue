@@ -88,7 +88,7 @@ a.router-link-exact-active {
 .MainDetail {
   display: flex;
   flex-direction: column;
-  margin-left: 20%;
+  margin-left: 15%;
   margin-top: 40px;
   width: 70%;
   height: 850px;

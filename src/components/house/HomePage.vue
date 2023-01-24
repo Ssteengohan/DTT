@@ -30,14 +30,14 @@
     </div>
   </main>
 </template>
-<style>
+<style scoped>
 .MainPost {
   display: flex;
   cursor: pointer;
   background-color: var(--background2);
   width: 70%;
   margin-top: 20px;
-  margin-left: 20%;
+  margin-left: 15%;
   border-radius: 10px;
 }
 
@@ -48,7 +48,6 @@
 }
 
 .postImg img {
-  display: flex;
   border-radius: 10px;
   height: 140px;
   width: 140px;
@@ -69,8 +68,7 @@
   margin-top: 0px;
 }
 
-.housePrice,
-.ZipCode {
+.housePrice, .ZipCode {
   font-family: var(--font-family);
   color: var(--secondary-text);
   font-weight: 400;

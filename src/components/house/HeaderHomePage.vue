@@ -28,9 +28,11 @@ export default {
                 <h2 class="titel">Houses</h2>
             </div>
                 <div class="buttonCreate">
+                    <router-link to="/home/create">
                     <img src="@/assets/dtt/plus.png" alt="plus" class="plus">
                     <button class="create"><img src="@/assets/dtt/plus-white.png" alt="pluswhite"
                         class="pluswhite">CREATE NEW</button>
+                    </router-link>
                     </div>
             </div>
             <div class="homepageButton">
@@ -49,11 +51,11 @@ export default {
     </main>
 </template>
   
-<style>
+<style scoped>
 .mainpage {
     display: flex;
     flex-direction: column;
-    margin-left: 20%;
+    margin-left: 15%;
     margin-top: 40px;
     width: 70%;
 

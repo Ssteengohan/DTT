@@ -98,7 +98,7 @@ nav {
 }
 
 .navbar {
-  margin-left: 20%;
+  margin-left: 15%;
   display: flex;
 }
 
