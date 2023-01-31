@@ -1,80 +1,110 @@
-<script setup>
+<script>
+import { useRoute } from 'vue-router'
+import { useHousesStore } from "@/stores/data-fetching.js";
+import { reactive, watch } from 'vue';
+
+export default {
+  setup() {
+    const route = useRoute()
+    const id = route.params.id - 2
+    const ids = route.params.id
+    const { houses, fetchHouses } = useHousesStore()
+
+    watch(() => houses, () => {
+      fetchHouses()
+    })
+
+    return {
+      id,
+      houses: reactive(houses),
+      fetchHouses,
+      ids
+    }
+  },
+  created() {
+    this.fetchHouses()
+  }
+}
 </script>
 
 <template>
   <main>
     <div class="MainDetail">
-      <div class="backgroundimg">
-        <div class="Goback">
-          <router-link  style="text-decoration: none; display: flex; color: inherit;" to="/">
+      <div class="backgroundimg"  :style="{ 'background-image': `url(${houses[`${id}`].image})` }">
+        <div class="Goback-mob">
+          <router-link style="text-decoration: none; display: flex; color: inherit;" to="/">
+            <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
+          </router-link>
+        </div>
+        <div class="mobilEdit">
+          <router-link :to="`/home/edit/${ ids }`" style="text-decoration: none;" > <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" /></router-link>
+          <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
+        </div>
+      </div>
+      <div class="Goback">
+          <router-link style="text-decoration: none; display: flex; color: inherit; padding-bottom: 10px;" to="/">
             <img src="@/assets/dtt/back.png" alt="back" id="back" class="back">
             <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
             <h3 class="BackTo">Back to overview</h3>
           </router-link>
         </div>
-        <div class="mobilEdit">
-          <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" />
-          <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
-        </div>
-      </div>
-      <div class="DetailContainer">
+      <div class="DetailContainer" >
         <div class="Detail">
           <div class="DetailImg">
-            <img src="@/assets/dtt/house.png" alt="house-img" class="Detailhouse" />
+            <img :src="houses[`${id}`].image" alt="house-img" class="Detailhouse" />
           </div>
           <div class="DetailInfo">
             <div class="DetailEdit">
-              <h3 class="DetailStreet">Stokvisstraat 132</h3>
-              <img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" />
+              <h3 class="DetailStreet">{{ houses[`${id}`].location.street }}</h3>
+              <router-link :to="`/home/edit/${ ids }`" style="text-decoration: none;" ><img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
               <img src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
 
             </div>
-            <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">1011
-              AA Amsterdam</p>
+            <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">{{ houses[`${id}`].location.zip }} {{ houses[`${id}`].location.city }}</p>
             <div class="DetailInfos">
               <img src="@/assets/dtt/price.png" alt="">
-              <p>500.000</p>
+              <p>{{ houses[`${id}`].price }}</p>
               <img src="@/assets/dtt/size.png" alt="">
-              <p>120 m2</p>
+              <p>{{ houses[`${id}`].size }}</p>
               <img src="@/assets/dtt/construction.png" alt="">
-              <p>Built in 1990</p>
+              <p>{{ houses[`${id}`].constructionYear }}</p>
             </div>
             <div class="DetailExtraInfos">
               <img src="@/assets/dtt/bed.png" alt="">
-              <p>1</p>
+              <p>{{ houses[`${id}`].rooms.bedrooms}}</p>
               <img src="@/assets/dtt/bath.png" alt="">
-              <p>1</p>
+              <p>{{ houses[`${id}`].rooms.bathrooms }}</p>
               <img src="@/assets/dtt/garage.png" alt="">
-              <p>Yes</p>
+              <p>{{ houses[`${id}`].hasGarage }}</p>
             </div>
             <div class="DetailDescription">
-              <p class="DetailDescriptionText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
-                nunc vel tincidunt lacinia, nunc nisl aliquam nisl, vel aliquet nisl nisl sit amet nisl. Sed euismod,
-                nunc vel tincidunt lacinia, nunc nisl aliquam nisl, vel aliquet nisl nisl sit amet nisl.</p>
+              <p class="DetailDescriptionText"> {{ houses[`${id}`].description }} </p>
             </div>
           </div>
         </div>
         <div class="Recommended">
           <h3 class="RecommendedTitel">Recommended for you</h3>
-          <div class="RecommendedContainer" v-for="i in 3" :key="i">
+          <div class="RecommendedContainer" v-for="house in houses.slice(0, 3)" :key="house.id">
+            <router-link :to="`/home/detail/${ house.id }`" style="text-decoration: none;">
             <div class="RecommendedInfo">
               <div class="RecommendedImg">
-                <img src="@/assets/dtt/house.png" alt="house-img" class="RecommendedHouse" />
+                <img :src="house.image" alt="house-img" class="RecommendedHouse" />
               </div>
               <div class="RecommendeDetail">
-                <h3 class="RecommendedStreet">Stokvisstraat 132</h3>
-                <p class="RecommendedPrice">€ 500.000</p>
-                <p class="RecommendedZipcode">1011 AA Amsterdam</p>
+                <h3 class="RecommendedStreet">{{ house.location.street }}</h3>
+                <p class="RecommendedPrice">{{ house.price }}</p>
+                <p class="RecommendedZipcode">{{ house.location.zip }} {{ house.location.city }}</p>
                 <div class="RecommendedDetail">
                   <img src="@/assets/dtt/bed.png" alt="">
-                  <p>1</p>
+                  <p>{{ house.rooms.bedrooms }}</p>
                   <img src="@/assets/dtt/bath.png" alt="">
-                  <p>1</p>
+                  <p>{{ house.rooms.bathrooms }}</p>
                   <img src="@/assets/dtt/size.png" alt="">
-                  <p>120 m2</p>
+                  <p>{{ house.size }}</p>
                 </div>
               </div>
             </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -85,10 +115,11 @@
 a.router-link-exact-active {
   color: var(--primary-text);
 }
+
 .MainDetail {
   display: flex;
   flex-direction: column;
-  margin-left: 20%;
+  margin-left: 15%;
   margin-top: 40px;
   width: 70%;
   height: 850px;
@@ -116,6 +147,7 @@ a.router-link-exact-active {
 .mobilEdit img {
   display: none;
 }
+
 .DetailContainer {
   display: flex;
   justify-content: space-between;
@@ -124,7 +156,6 @@ a.router-link-exact-active {
 .Detail {
   background: var(--background2);
   width: 60%;
-  height: 750px;
   display: flex;
   flex-direction: column;
 }
@@ -312,6 +343,10 @@ a.router-link-exact-active {
   padding-left: 10px;
   padding-right: 10px;
 }
+.backgroundimg {
+  display: none;
+}
+
 
 @media screen and (max-width: 750px) {
   .MainDetail {
@@ -321,9 +356,9 @@ a.router-link-exact-active {
   }
 
   .backgroundimg {
+    display: block;
     display: flex;
     justify-content: space-between;
-    background-image: url("@/assets/dtt/house.png");
     background-repeat: no-repeat;
     background-size: 100%;
     height: 25%;
@@ -340,7 +375,6 @@ a.router-link-exact-active {
 
   .Detail {
     width: 100%;
-    height: 100%;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
   }
@@ -348,8 +382,12 @@ a.router-link-exact-active {
   .Detailhouse {
     display: none;
   }
+
+  .Goback-mob {
+    align-items: baseline;
+  }
   .Goback {
-   align-items: baseline;
+    display: none;
   }
 
   .edit-detail,
@@ -366,25 +404,30 @@ a.router-link-exact-active {
     margin-left: 20px;
     margin-top: 50px;
   }
+
   .mobilEdit {
     display: flex;
     margin-left: 20px;
     margin-top: 40px;
   }
+
   .mobilEdit img {
     display: block;
     height: 20px;
-   padding: 10px;
+    padding: 10px;
   }
+
   .Recommended {
-  width: 80%;
-   margin: auto;
+    width: 80%;
+    margin: auto;
   }
+
   .DetailStreet {
     font-size: 25px;
   }
+
   .DetailInfo {
-     font-size: 15px;
+    font-size: 15px;
   }
 }
 </style>

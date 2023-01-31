@@ -1,28 +1,45 @@
-<script setup></script>
+<script>
+import { useHousesStore } from "@/stores/data-fetching.js";
+
+export default {
+  setup() {
+    const { houses, fetchHouses } = useHousesStore()
+
+    return {
+      houses,
+      fetchHouses
+    }
+  },
+  created() {
+    this.fetchHouses()
+  }
+}
+</script>
 
 <template>
   <main>
-    <div class="MainPost"   v-for="i in 10" :key="i" >
-      <router-link to="/home/detail" style="text-decoration: none; width: 100%;">
+    <div class="MainPost" v-for="house in houses" :key="house.id">
+      <p class="hidden">{{ house.id  }}</p>
+      <router-link :to="`/home/detail/${ house.id }`" style="text-decoration: none; width: 100%">
         <div class="PostInfo">
           <div class="postImg">
-            <img src="@/assets/dtt/house.png" alt="" class="houseImg" />
+            <img  :src="house.image" alt="" class="houseImg" />
           </div>
           <div class="PostDetail">
-            <h3 class="street">Stokvisstraat 132</h3>
-            <p class="housePrice">€ 500.000</p>
-            <p class="ZipCode">1011 AA Amsterdam</p>
+            <h3 class="street">{{ house.location.street }}</h3>
+            <p class="housePrice">€ {{ house.price }}</p>
+            <p class="ZipCode">{{ house.location.zip }} {{ house.location.city }}</p>
             <div class="info">
-              <img class="bed" src="@/assets/dtt/bed.png" alt="bed-logo">
-              <p>1</p>
-              <img src="@/assets/dtt/bath.png" alt="bath-logo">
-              <p>1</p>
-              <img src="@/assets/dtt/size.png" alt="size-logo">
-              <p>120 m2</p>
+              <img class="bed" src="@/assets/dtt/bed.png" alt="bed-logo" />
+              <p>{{ house.rooms.bedrooms }}</p>
+              <img src="@/assets/dtt/bath.png" alt="bath-logo" />
+              <p>{{ house.rooms.bathrooms }}</p>
+              <img src="@/assets/dtt/size.png" alt="size-logo" />
+              <p>{{ house.size }}</p>
             </div>
           </div>
           <div class="postEdit">
-            <img src="@/assets/dtt/edit-red.png" alt="" class="edit" />
+            <router-link :to="`/home/edit/${ house.id }`" style="text-decoration: none;" > <img src="@/assets/dtt/edit-red.png" alt="" class="edit" /></router-link>  
             <img src="@/assets/dtt/delete.png" alt="" class="delete" />
           </div>
         </div>
@@ -30,14 +47,18 @@
     </div>
   </main>
 </template>
-<style>
+
+<style scoped>
+.hidden {
+  display: none;
+}
 .MainPost {
   display: flex;
   cursor: pointer;
   background-color: var(--background2);
   width: 70%;
   margin-top: 20px;
-  margin-left: 20%;
+  margin-left: 15%;
   border-radius: 10px;
 }
 
@@ -48,7 +69,6 @@
 }
 
 .postImg img {
-  display: flex;
   border-radius: 10px;
   height: 140px;
   width: 140px;
@@ -104,37 +124,46 @@
   height: 20px;
   max-width: 8%;
   margin-bottom: 80px;
-  
 }
+
 .edit {
   padding-right: 10px;
+  height: 20px; 
 }
+
 @media screen and (max-width: 750px) {
   .MainPost {
     width: 95%;
     margin-left: 0;
   }
+
   .postImg img {
     height: 120px;
     width: 120px;
   }
+
   .street {
     font-size: 15px;
   }
-  .housePrice, .ZipCode {
+
+  .housePrice,
+  .ZipCode {
     font-size: 12px;
   }
+
   .PostDetail {
     margin-left: 10px;
   }
+
   .info p {
     font-size: 10px;
     height: 100%;
-  
   }
+
   .info img {
     height: 10px;
   }
+
   .info {
     margin-left: 0;
     white-space: nowrap;
