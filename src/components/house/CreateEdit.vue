@@ -1,109 +1,62 @@
 <script>
-import { ref, computed } from 'vue';
-import { api } from "@/stores/post-api.js";
+import { useRoute } from 'vue-router'
+import { useHousesStore } from "@/stores/data-fetching.js";
+import { reactive, watch } from 'vue';
 
 export default {
-    setup() {
-        const price = ref("");
-        const bedrooms = ref("");
-        const bathrooms = ref("");
-        const size = ref("");
-        const streetName = ref("");
-        const houseNumber = ref("");
-        const numberAddition = ref("");
-        const zip = ref("");
-        const city = ref("");
-        const constructionYear = ref("");
-        const hasGarage = ref("");
-        const description = ref("");
+  setup() {
+    const route = useRoute()
+    const id = route.params.id - 2
+    const ids = route.params.id
+    const { houses, fetchHouses } = useHousesStore()
 
-        const url = ref(null);
+    watch(() => houses, () => {
+      fetchHouses()
+    })
 
-        function onFileChange(e) {
-            const file = e.target.files[0];
-            url.value = URL.createObjectURL(file);
-        }
-        function revokeUrl(e) {
-            URL.revokeObjectURL(url.value);
-            url.value = null;
-            e.target.previousSibling.value = null;
-        }
-
-        const hideLabel = computed(() => !url.value);
-        const showClear = computed(() => !!url.value);
-
-        function submitForm() {
-            api
-            .postData({
-                price: price.value,
-                bedrooms: bedrooms.value,
-                bathrooms: bathrooms.value,
-                size: size.value,
-                streetName: streetName.value,
-                houseNumber: houseNumber.value,
-                numberAddition: numberAddition.value,
-                zip: zip.value,
-                city: city.value,
-                constructionYear: constructionYear.value,
-                hasGarage: hasGarage.value,
-                description: description.value
-            })
-            .then(result => console.log(result));
-        }
-
-        return {
-            price,
-            bedrooms,
-            bathrooms,
-            size,
-            streetName,
-            houseNumber,
-            numberAddition,
-            zip,
-            city,
-            constructionYear,
-            hasGarage,
-            description,
-            submitForm,
-            url,
-            hideLabel,
-            showClear,
-            onFileChange,
-            revokeUrl
-        };
+    return {
+      id,
+      houses: reactive(houses),
+      fetchHouses,
+      ids
     }
-};
+  },
+  created() {
+    this.fetchHouses()
+  }
+}
 </script>
 
 <template>
     <main>
+        {{ houses[`${id}`] }}
         <div class="bg">
             <div class="Post">
                 <div class="BackHome">
-                    <router-link to="/">
+                    <router-link :to="`/home/detail/${ids}`">
                         <img src="@/assets/dtt/back.png" alt="back">
                         <p class="PBack">Back to overview</p>
                     </router-link>
                     <h1>Create new listing</h1>
                 </div>
-                <form @submit.prevent="submitForm">
+                <form>
                 <div class="PostInput">
                     <p>Street name*</p>
-                    <input type="text" placeholder="Enter the street name" class="Street" v-model="streetName">
+                    <input type="text" placeholder="Enter the street name" :value="`${ houses[`${id}`].location.street }`" class="Street">
                     <div class="NextEachOther">
                         <div class="House">
                             <p>House number*</p>
-                            <input type="text" placeholder="Enter house number" class="HouseNumber" v-model="houseNumber">
+                            <input type="text" placeholder="Enter house number" :value="`${ houses[`${id}`].price }`" class="HouseNumber">
                         </div>
                         <div class="Addition">
                             <p>Addition</p>
-                            <input type="text" placeholder="e.g. A" class="AdditionNumber" v-model="numberAddition">
+                            <input type="text" placeholder="e.g. A" class="AdditionNumber">
                         </div>
                     </div>
                     <p>Postal code*</p>
-                    <input type="text" placeholder="e.g. 1000 AA" class="postal" v-model="zip">
+                    <input type="text" placeholder="e.g. 1000 AA" class="postal">
                     <p>City*</p>
-                    <input type="text" placeholder="e.g. Utrecht" class="City" v-model="city">
+                    <input type="text" placeholder="e.g. Utrecht" class="City">
                     <h4>Upload picture (PNG or JPG)*</h4>
                     <div class="upload" v-if="hideLabel">
                         <label class="Picture">
@@ -117,11 +70,11 @@ export default {
                             @click="revokeUrl">
                     </div>
                     <p>Price*</p>
-                    <input type="text" placeholder="e.g. €150.000" class="Price" v-model="price" >
+                    <input type="text" placeholder="e.g. €150.000" class="Price" >
                     <div class="SizeAndGarage">
                         <div class="Size">
                             <p>Size*</p>
-                            <input type="text" placeholder="e.g. 60m2" class="SizeNumber" v-model="size">
+                            <input type="text" placeholder="e.g. 60m2" class="SizeNumber">
                         </div>
                         <div class="Garage">
                             <p>Garage*</p>
@@ -141,15 +94,15 @@ export default {
                     <div class="BedAndBath">
                         <div class="Bedrooms">
                             <p>Bedrooms*</p>
-                            <input type="text" placeholder="Enter amount" class="Bedroom" v-model="bedrooms">
+                            <input type="text" placeholder="Enter amount" class="Bedroom">
                         </div>
                         <div class="Bathrooms">
                             <p>Bathrooms*</p>
-                            <input type="text" placeholder="Enter amount" class="Bathroom" v-model="bathrooms">
+                            <input type="text" placeholder="Enter amount" class="Bathroom">
                         </div>
                     </div>
                     <p>Construction date*</p>
-                    <input type="text" placeholder="e.g. 1990" class="ConstructionDate" v-model="constructionYear">
+                    <input type="text" placeholder="e.g. 1990" class="ConstructionDate">
                     <div class="Description">
                         <p>Description</p>
                         <textarea name="description" cols="46" rows="5" placeholder="Enter description"></textarea>

@@ -3,6 +3,7 @@ import HouseView from '../views/HouseView.vue'
 import HouseDetail from '../views/HouseDetail.vue'
 import HomeView from '../views/HomeView.vue'
 import HouseCreate from '../views/HouseCreate.vue'
+import HouseEdit from '../views/HouseEdit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,7 +19,7 @@ const router = createRouter({
           component: HouseView,
         },
         {
-          path: '/home/detail',
+          path: '/home/detail/:id',
           name: 'Detail',
           component: HouseDetail
         },  
@@ -26,6 +27,11 @@ const router = createRouter({
           path: '/home/create',
           name: 'create',
           component: HouseCreate
+        },
+        {
+          path: '/home/edit/:id',
+          name: 'edit',
+          component: HouseEdit
         }
       ]
     },
