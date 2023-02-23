@@ -1,15 +1,17 @@
 <script>
 import { ref, computed } from 'vue'
+//Looking if the search input is empty or not if it is empty the clear icon will not show up 
+const searchText = ref('')
+const showClearIcon = computed(() => searchText.value !== '')
+
+function clearInput() {
+    searchText.value = ''
+}
+
+export { searchText }
 
 export default {
     setup() {
-        const searchText = ref('')
-
-        const showClearIcon = computed(() => searchText.value !== '')
-
-        function clearInput() {
-            searchText.value = ''
-        }
 
         return {
             searchText,
@@ -19,29 +21,30 @@ export default {
     }
 }
 </script>
+
         
 <template>
     <main>
         <div class="mainpage">
             <div class="HouseCreate">
-            <div class="header">
-                <h2 class="titel">Houses</h2>
-            </div>
+                <div class="header">
+                    <h2 class="titel">Houses</h2>
+                </div>
                 <div class="buttonCreate">
-                    <router-link to="/home/create">
-                    <img src="@/assets/dtt/plus.png" alt="plus" class="plus">
-                    <button class="create"><img src="@/assets/dtt/plus-white.png" alt="pluswhite"
-                        class="pluswhite">CREATE NEW</button>
+                    <router-link :to="{ name: 'create' }">
+                        <img src="@/assets/dtt/plus.png" alt="plus" class="plus">
+                        <button class="create"><img src="@/assets/dtt/plus-white.png" alt="pluswhite"
+                                class="pluswhite">CREATE NEW</button>
                     </router-link>
-                    </div>
+                </div>
             </div>
             <div class="homepageButton">
-                    <div class="input">
-                        <img src="@/assets/dtt/search.png" alt="search-icon" class="SearchIcon" />
-                        <img src="@/assets/dtt/clear.png" alt="" class="clear" v-if="showClearIcon" @click="clearInput" />
-                        <input type="text" name="search" placeholder="Search for a house" v-model="searchText"
-                            @input="showClearIcon = true" />
-                    </div>
+                <div class="input">
+                    <img src="@/assets/dtt/search.png" alt="search-icon" class="SearchIcon" />
+                    <img src="@/assets/dtt/clear.png" alt="" class="clear" v-if="showClearIcon" @click="clearInput" />
+                    <input type="text" name="search" placeholder="Search for a house" v-model="searchText"
+                        @input="showClearIcon = true" />
+                </div>
                 <div class="filter">
                     <button class="price">Price</button>
                     <button class="size">Size</button>
@@ -57,7 +60,7 @@ export default {
     flex-direction: column;
     margin-left: 15%;
     margin-top: 40px;
-    width: 70%;
+    max-width: 70%;
 
 }
 
@@ -67,21 +70,21 @@ export default {
     font-family: var(--font-family);
     color: var(--primary-text);
     font-weight: 700;
-    width: 100%;
+    max-width: 100%;
     font-size: 25px;
-    
+
 }
 
 
 .buttonCreate {
     margin-top: 40px;
-   
+
 }
 
 .create {
     cursor: pointer;
     width: 180px;
-    height: 40px;
+    min-height: 40px;
     border-radius: 10px;
     background-color: var(--primary);
     color: var(--background);
@@ -89,7 +92,7 @@ export default {
     font-weight: 700;
     font-size: 15px;
     border: none;
-   
+
 }
 
 .plus {
@@ -98,13 +101,15 @@ export default {
 
 .create img {
     cursor: pointer;
-    width: 15px;
+    max-width: 15px;
     margin-right: 10px;
 }
+
 .homepageButton {
     display: flex;
     justify-content: space-between;
 }
+
 .input {
     position: relative;
 }
@@ -157,42 +162,40 @@ input[type="text"]:focus {
     background-color: var(--tertiary2);
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    width: 130px;
-    height: 5.5vh;
-    color: var(--background);
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 15px;
 
-    border: none;
 }
 
 .price {
     background-color: var(--primary);
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+
+}
+
+.size, .price {
     width: 130px;
     height: 5.5vh;
     color: var(--background);
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 15px;
-
     border: none;
-} 
+}
 
 @media (max-width: 750px) {
     .mainpage {
-        margin-left: 0;
+        margin-left: 40px;
         width: 100%;
         display: flex;
         flex-direction: column;
     }
+
     .header {
         margin-left: auto;
         margin-right: auto;
         display: table;
     }
+
     .create,
     .pluswhite {
         display: none;
@@ -201,26 +204,29 @@ input[type="text"]:focus {
     .plus {
         cursor: pointer;
         display: flex;
-        margin-left: auto;
+        margin-top: 8px;
         width: 20px;
         height: 20px;
-        margin-right: 20px;
+        margin-right: 0px;
     }
+
     .homepageButton {
         display: flex;
         flex-direction: column;
         margin-left: 10px;
 
     }
+
     .input {
-      padding-bottom: 20px;
+        padding-bottom: 20px;
     }
+
     input[type="text"] {
-        width: 85%;
+        min-width: 110%;
     }
 
     .clear {
-        margin-left: 88%;
+        margin-left: 100%;
         width: 18px;
     }
 
@@ -228,8 +234,8 @@ input[type="text"]:focus {
 
     .price,
     .size {
-        width: 47%;
-        height: 40px;
+        min-width: 61%;
+        max-height: 40px;
     }
 }
 </style>  

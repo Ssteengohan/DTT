@@ -1,393 +1,351 @@
 <script>
-import { ref, computed } from 'vue';
-import { api } from "@/stores/post-api.js";
+import { usePostStore } from '@/stores/api.js';
 
 export default {
-    setup() {
-        const price = ref("");
-        const bedrooms = ref("");
-        const bathrooms = ref("");
-        const size = ref("");
-        const streetName = ref("");
-        const houseNumber = ref("");
-        const numberAddition = ref("");
-        const zip = ref("");
-        const city = ref("");
-        const constructionYear = ref("");
-        const hasGarage = ref("");
-        const description = ref("");
+  data() {
+    return {
+      newPost: {
+        price: '',
+        bedrooms: '',
+        bathrooms: '',
+        size: '',
+        streetName: '',
+        houseNumber: '',
+        numberAddition: '',
+        zip: '',
+        city: '',
+        constructionYear: '',
+        hasGarage: '',
+        description: '',
+      },
+      image: null,
+      url: null,
+    };
+  },
+  methods: {
+    goBack() {//Go back to previous page
+      this.$router.go(-1);
+    },
+    handleClear() {//Clear the file input
+      this.image = null;
+      this.url = null;
+      const input = this.$refs.imageInput;
+      input.type = 'text';
+      input.type = 'file';
+    },
+    handleImageChange(event) {//Show the image preview
+      this.image = event.target.files[0];
+      this.url = URL.createObjectURL(this.image);
 
-        const url = ref(null);
-
-        function onFileChange(e) {
-            const file = e.target.files[0];
-            url.value = URL.createObjectURL(file);
-        }
-        function revokeUrl(e) {
-            URL.revokeObjectURL(url.value);
-            url.value = null;
-            e.target.previousSibling.value = null;
-        }
-
-        const hideLabel = computed(() => !url.value);
-        const showClear = computed(() => !!url.value);
-
-        function submitForm() {
-            api
-            .postData({
-                price: price.value,
-                bedrooms: bedrooms.value,
-                bathrooms: bathrooms.value,
-                size: size.value,
-                streetName: streetName.value,
-                houseNumber: houseNumber.value,
-                numberAddition: numberAddition.value,
-                zip: zip.value,
-                city: city.value,
-                constructionYear: constructionYear.value,
-                hasGarage: hasGarage.value,
-                description: description.value
-            })
-            .then(result => console.log(result));
-        }
-
-        return {
-            price,
-            bedrooms,
-            bathrooms,
-            size,
-            streetName,
-            houseNumber,
-            numberAddition,
-            zip,
-            city,
-            constructionYear,
-            hasGarage,
-            description,
-            submitForm,
-            url,
-            hideLabel,
-            showClear,
-            onFileChange,
-            revokeUrl
-        };
-    }
+    },
+    handleSubmit() {//Submit the form
+      const postStore = usePostStore();
+      postStore.postHouses(this.newPost, this.image)
+        .then(() => {
+          this.$router.push('/');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
 };
 </script>
-
 <template>
-    <main>
-        <div class="bg">
-            <div class="Post">
-                <div class="BackHome">
-                    <router-link to="/">
-                        <img src="@/assets/dtt/back.png" alt="back">
-                        <p class="PBack">Back to overview</p>
-                    </router-link>
-                    <h1>Create new listing</h1>
-                </div>
-                <form @submit.prevent="submitForm">
-                <div class="PostInput">
-                    <p>Street name*</p>
-                    <input type="text" placeholder="Enter the street name" class="Street" v-model="streetName">
-                    <div class="NextEachOther">
-                        <div class="House">
-                            <p>House number*</p>
-                            <input type="text" placeholder="Enter house number" class="HouseNumber" v-model="houseNumber">
-                        </div>
-                        <div class="Addition">
-                            <p>Addition</p>
-                            <input type="text" placeholder="e.g. A" class="AdditionNumber" v-model="numberAddition">
-                        </div>
-                    </div>
-                    <p>Postal code*</p>
-                    <input type="text" placeholder="e.g. 1000 AA" class="postal" v-model="zip">
-                    <p>City*</p>
-                    <input type="text" placeholder="e.g. Utrecht" class="City" v-model="city">
-                    <h4>Upload picture (PNG or JPG)*</h4>
-                    <div class="upload" v-if="hideLabel">
-                        <label class="Picture">
-                            <input type="file" @change="onFileChange" />
-                            <img class="plus" src="@/assets/dtt/plus.png" alt="plus">
-                        </label>
-                    </div>
-                    <div class="preview">
-                        <img class="img-preview" v-if="url" :src="url" />
-                        <img src="@/assets/dtt/clear-white.png" class="clear" alt="clear" v-if="showClear"
-                            @click="revokeUrl">
-                    </div>
-                    <p>Price*</p>
-                    <input type="text" placeholder="e.g. €150.000" class="Price" v-model="price" >
-                    <div class="SizeAndGarage">
-                        <div class="Size">
-                            <p>Size*</p>
-                            <input type="text" placeholder="e.g. 60m2" class="SizeNumber" v-model="size">
-                        </div>
-                        <div class="Garage">
-                            <p>Garage*</p>
-                            <div class="selectdiv">
-                                <label>
-                                    <select>
-                                        <option value="" disabled selected>Select</option>
-                                        <option>Yes</option>
-                                        <option>No</option>
-                                    </select>
-                                </label>
-                            </div>
-
-
-                        </div>
-                    </div>
-                    <div class="BedAndBath">
-                        <div class="Bedrooms">
-                            <p>Bedrooms*</p>
-                            <input type="text" placeholder="Enter amount" class="Bedroom" v-model="bedrooms">
-                        </div>
-                        <div class="Bathrooms">
-                            <p>Bathrooms*</p>
-                            <input type="text" placeholder="Enter amount" class="Bathroom" v-model="bathrooms">
-                        </div>
-                    </div>
-                    <p>Construction date*</p>
-                    <input type="text" placeholder="e.g. 1990" class="ConstructionDate" v-model="constructionYear">
-                    <div class="Description">
-                        <p>Description</p>
-                        <textarea name="description" cols="46" rows="5" placeholder="Enter description"></textarea>
-                    </div>
-                    <div class="button">
-                        <button>Post</button>
-                    </div>
-                </div>
-                </form>
-            </div>
+  <div class="bg">
+    <div class="BackHome">
+        <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+        <p class="PBack">Back to overview</p>
+    </div>
+    <div class="post-form">
+      <h1>Create new listing</h1>
+      <form @submit.prevent="handleSubmit">
+        <div class="one">
+          <label for="streetName">Street name*</label>
+          <input type="text" v-model="newPost.streetName" placeholder="Enter the street name" required pattern="^[a-zA-Z\s]+$" title="Has to be a letter " />
         </div>
-    </main>
+        <div class="two">
+          <div class="first">
+            <label for="houseNumber">House number*</label>
+            <input type="text" v-model="newPost.houseNumber" placeholder="Enter house number" required pattern="[0-9]+"
+              title="Has to be a number" />
+          </div>
+          <div class="second">
+            <label for="numberAddition">Number addition*</label>
+            <input type="text" v-model="newPost.numberAddition" placeholder="e.g.A" />
+          </div>
+        </div>
+        <div class="one">
+          <label for="zip">Postal code*</label>
+          <input type="text" v-model="newPost.zip" placeholder="e.g. 1000 AA" required pattern="[0-9]{4}\s?[a-zA-Z]{2}"
+            title="Has to be atleast 4 digits a space and 2 letters" />
+        </div>
+        <div class="one">
+          <label for="city">City*</label>
+          <input type="text" v-model="newPost.city" placeholder="e.g. Utrecht" required pattern="[a-zA-Z]+"
+            title="Has to be a letter " />
+        </div>
+        <div class="img">
+          <img class="preview" v-if="url" :src="url" />
+          <img src="@/assets/dtt/clear-white.png" class="clear" alt="clear" v-if="url" @click="handleClear" />
+          <div class="upload" v-else>
+            <label>Upload picture (PNG or JPG)</label>
+            <label id="box" for="image">
+              <img class="plus" src="@/assets/dtt/plus.png" alt="plus">
+            </label>
+          </div>
+          <input type="file" id="image" accept="image/png, image/jpeg" @change="handleImageChange" required
+            title="Only PNG or JPEG" />
+        </div>
+        <div class="one">
+          <label for="price">Price*</label>
+          <input type="text" v-model="newPost.price" placeholder="e.g. €150.000 " required pattern="\d+(\.\d{1,2})?"
+            title="Has to be a number" />
+        </div>
+        <div class="two">
+          <div class="first" id="een">
+            <label for="size">Size*</label>
+            <input type="text" v-model="newPost.size" placeholder="e.g. 60m2" required pattern="\d+(\.\d{1,2})?" />
+          </div>
+          <div class="second" id="twee">
+            <label for="hasGarage">Has garage*</label>
+            <select v-model="newPost.hasGarage" required>
+              <option value="" disabled selected>Select</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="two">
+          <div class="first">
+            <label for="bedrooms">Bedrooms*</label>
+            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required />
+          </div>
+          <div class="sec">
+            <label for="bathrooms">Bathrooms*</label>
+            <input type="text" v-model="newPost.bathrooms" placeholder="Enter amount" required />
+          </div>
+        </div>
+        <div class="one">
+          <label for="constructionYear">Construction year*</label>
+          <input type="text" v-model="newPost.constructionYear" placeholder="e.g. 1980" required
+            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940" />
+        </div>
+        <div class="one">
+          <label for="description">Description*</label>
+          <textarea v-model="newPost.description" placeholder="Write a description" required></textarea>
+        </div>
+        <button type="submit">POST</button>
+      </form>
+    </div>
+  </div>
 </template>
-
+  
 <style scoped>
-
-main {
-    max-width: 100%;
-}
-
 .bg {
-    background-image: url("@/assets/dtt/background.png");
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    height: 100%;
-
+  background-image: url("@/assets/dtt/background.png");
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.Post {
-    margin-left: 15%;
-    margin-top: 40px;
-    width: 25%;
+.BackHome {
+  margin-left: 15%;
+  margin-top: 2rem;
+  display: flex;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text1);
+  align-items: center;
 }
 
-
-a {
-    display: flex;
-    text-decoration: none;
-    font-family: var(--font-family);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text1);
-    align-items: center;
-}
-
-a img {
-    width: 20px;
-    height: 20px;
+.BackHome img {
+  width: 20px;
+  height: 20px;
 }
 
 .PBack {
-    margin-left: 12px;
+  margin-left: 12px;
 }
 
 h1 {
-    font-family: var(--font-family);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text1);
+  font-family: var(--font-family);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text1);
 }
 
-input[type="text"] {
-    cursor: pointer;
-    width: 350px;
-    height: 40px;
-    border: 1px;
-    border-radius: 10px;
-    font-family: var(--font-family-alt);
-    font-weight: 400;
-    font-size: 15px;
-    color: var(--secondary-text);
-    background-color: var(--background2);
-    padding-left: 20px;
+.post-form {
+  max-width: 370px;
+  min-height: 1000px;
+  margin-left: 14%;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 400;
 }
 
-input[type="text"]::placeholder {
-    color: var(--tertiary2);
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 12px;
+.one {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+label {
+    padding-bottom: 10px;
+}
+.two {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
 }
 
-input[type="text"]:focus {
-    outline: none;
+#een,
+#twee {
+  display: flex;
+  flex-direction: column;
 }
 
-.PostInput p {
-    font-family: var(--font-family);
-    font-size: 12px;
-    font-weight: 400;
+#twee select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: block;
+  height: 40px;
+  border: 1px;
+  border-radius: 10px;
+  font-family: var(--font-family-alt);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--secondary-text);
+  background-color: var(--background2);
+  min-width: 180px;
 }
 
-h4 {
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 14px;
+.upload #box {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  height: 100px;
+  border-style: dashed;
+  border-width: 3px;
+  border-color: var(--tertiary2);
+  margin-bottom: 10px;
 }
 
-.NextEachOther,
-.SizeAndGarage,
-.BedAndBath {
-    display: flex;
-    width: 100%;
-    
+input[type="file"] {
+  display: none;
 }
 
-.House,
-.Size,
-.Bedrooms {
-    display: flex;
-    flex-direction: column;
-    margin-right: 15px;
+.plus {
+  max-width: 30px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 35px;
+  margin-top: 35px;
 }
 
-
-.Addition,
-.Garage,
-.Bathrooms {
-    display: flex;
-    flex-direction: column;
-    margin-left: 15px;
-}
-
-.selectdiv {
-    position: relative;
-    min-width: 200px;
-  
-}
-option {
-    color: var(--tertiary2);
-}
-.selectdiv:after {
-    content: '<>';
-    font: 17px "Consolas", monospace;
-    color: var(--tertiary2);
-    transform: rotate(90deg);
-    right: 40px;
-    top: 12px;
-    padding: 0 0 2px;
-    position: absolute;
-}
-
-.selectdiv select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    display: block;
-    width: 85%;
-    max-width: 300px;
-    height: 40px;
-    border: 1px;
-    border-radius: 10px;
-    font-family: var(--font-family-alt);
-    font-weight: 400;
-    font-size: 15px;
-    color: var(--secondary-text);
-    background-color: var(--background2);
-}
-.NextEachOther input[type="text"],
-.SizeAndGarage input[type="text"],
-.BedAndBath input[type="text"] {
-    width: 147px;
-}
-
-textarea {
-    cursor: pointer;
-    border: 1px;
-    border-radius: 10px;
-    font-family: var(--font-family-alt);
-    font-weight: 400;
-    font-size: 15px;
-    color: var(--secondary-text);
-    background-color: var(--background2);
-    padding: 20px;
-    resize: none;
-}
-
-textarea::placeholder {
-    color: var(--tertiary2);
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 12px;
-}
-
-.button {
-    display: flex;
-    justify-content: flex-end;
-}
-
-button {
-    cursor: pointer;
-    width: 150px;
-    height: 40px;
-    border: 1px;
-    border-radius: 10px;
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--background2);
-    background-color: var(--primary);
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-.upload input[type="file"] {
-    display: none;
-}
-
-.upload {
-    width: 120px;
-    height: 120px;
-    border-style: dashed;
-    border-width: 3px;
-    border-color: var(--tertiary2);
-}
-
-label img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 35px;
-    height: 45%;
-    width: 45%;
-}
-
-.preview img {
-    width: 120px;
-    height: 120px;
-}
-.img-preview {
-    border-radius: 10px;
+.img .preview {
+  max-width: 100px;
+  min-height: 100px;
 }
 
 .clear {
-    position: absolute !important;
-    width: 30px !important;
-    height: 30px !important;
-    margin-left: -18px;
-    margin-top: -5px;
+  position: absolute !important;
+  max-width: 30px !important;
+  min-height: 30px !important;
+  margin-left: -18px;
+  margin-top: -5px;
 }
+
+input[type="text"] {
+  cursor: pointer;
+  max-width: 350px;
+  min-height: 40px;
+  border: 1px;
+  border-radius: 10px;
+  font-family: var(--font-family-alt);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--secondary-text);
+  background-color: var(--background2);
+  padding-left: 20px;
+}
+
+input[type="text"]::placeholder {
+  color: var(--tertiary2);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+
+input[type="text"]:focus {
+  outline: none;
+}
+
+.two input[type="text"] {
+  max-width: 155px;
+}
+
+.two .first {
+  padding-right: 15px;
+}
+
+textarea {
+  cursor: pointer;
+  border: 1px;
+  border-radius: 10px;
+  font-family: var(--font-family-alt);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--secondary-text);
+  background-color: var(--background2);
+  padding: 20px;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+}
+
+textarea::placeholder {
+  color: var(--tertiary2);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+button {
+  float: right;
+  cursor: pointer;
+  min-width: 170px;
+  min-height: 45px;
+  border: 1px;
+  border-radius: 10px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--background2);
+  background-color: var(--primary);
+}
+@media screen and (max-width: 750px) {
+  input[type="text"] {
+    width: 250px;
+  }
+  .two input[type="text"] {
+    max-width: 107px;
+  }
+  #twee select {
+    min-width: 127px;
+  }
+  .post-form {
+    max-width: 270px;
+  }
+}
+
+
 </style>

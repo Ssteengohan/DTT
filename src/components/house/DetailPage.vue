@@ -1,109 +1,134 @@
 <script>
-import { useRoute } from 'vue-router'
-import { useHousesStore } from "@/stores/data-fetching.js";
-import { reactive, watch } from 'vue';
+import { useHouseStore } from '@/stores/api.js';
+import { useRoute } from 'vue-router';
+import { showDeletePopup } from '@/stores/delete.js';
 
 export default {
-  setup() {
-    const route = useRoute()
-    const id = route.params.id - 2
-    const ids = route.params.id
-    const { houses, fetchHouses } = useHousesStore()
+  props: {
+    house: Object,
+  },
+  setup(props) {
+    const route = useRoute();
+    const id = route.params.id - 2;
+    const ids = route.params.id;
 
-    watch(() => houses, () => {
-      fetchHouses()
-    })
+    const store = useHouseStore();
+
+    const getHouses = () => {
+      store.getHouses();
+    }
+  
+    //Get houses
+    const Housez = () => {
+      return store.houses;
+    }
 
     return {
+      store,
+      getHouses,
+      Housez,
       id,
-      houses: reactive(houses),
-      fetchHouses,
-      ids
+      ids,
     }
   },
-  created() {
-    this.fetchHouses()
-  }
-}
+  methods: {
+    onDeleteClick(id) {
+      showDeletePopup(id, this.handleDelete);
+    },
+  },
+
+  mounted() {
+    this.getHouses();
+  },
+};
 </script>
+
+
 
 <template>
   <main>
-    <div class="MainDetail">
-      <div class="backgroundimg"  :style="{ 'background-image': `url(${houses[`${id}`].image})` }">
+    <div class="MainDetail" v-if="Housez()[id]">
+      <div class="backgroundimg" :style="{ 'background-image': `url(${Housez()[`${id}`].image})` }">
         <div class="Goback-mob">
           <router-link style="text-decoration: none; display: flex; color: inherit;" to="/">
             <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
           </router-link>
         </div>
-        <div class="mobilEdit">
-          <router-link :to="`/home/edit/${ ids }`" style="text-decoration: none;" > <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" /></router-link>
+        <div class="mobilEdit" v-if="ids > 11">
+          <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"> <img src="@/assets/dtt/edit-white.png"
+              alt="" class="edit-white" /></router-link>
+          <div @click.prevent="deleteHouse(Housez()[`${id}`].id)">
           <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
+          </div>
         </div>
       </div>
       <div class="Goback">
-          <router-link style="text-decoration: none; display: flex; color: inherit; padding-bottom: 10px;" to="/">
-            <img src="@/assets/dtt/back.png" alt="back" id="back" class="back">
-            <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
-            <h3 class="BackTo">Back to overview</h3>
-          </router-link>
-        </div>
-      <div class="DetailContainer" >
+        <router-link
+          style="text-decoration: none; display: flex; color: inherit; padding-bottom: 10px; flex-direction: row;" to="/">
+          <img src="@/assets/dtt/back.png" alt="back" id="back" class="back">
+          <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
+          <h3 class="BackTo">Back to overview</h3>
+        </router-link>
+      </div>
+      <div class="DetailContainer">
         <div class="Detail">
           <div class="DetailImg">
-            <img :src="houses[`${id}`].image" alt="house-img" class="Detailhouse" />
+            <img :src="Housez()[`${id}`].image" alt="house-img" class="Detailhouse" />
           </div>
           <div class="DetailInfo">
             <div class="DetailEdit">
-              <h3 class="DetailStreet">{{ houses[`${id}`].location.street }}</h3>
-              <router-link :to="`/home/edit/${ ids }`" style="text-decoration: none;" ><img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
-              <img src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
-
+              <h3 class="DetailStreet">{{ Housez()[`${id}`].location.street }}</h3>
+              <router-link v-if="ids > 11" :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"><img
+                  src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
+              <div @click.prevent="deleteHouse(Housez()[`${id}`].id)">
+                  <img v-if="ids > 11" src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
             </div>
-            <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">{{ houses[`${id}`].location.zip }} {{ houses[`${id}`].location.city }}</p>
+            </div>
+            <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">{{
+              Housez()[`${id}`].location.zip }} {{ Housez()[`${id}`].location.city }}</p>
             <div class="DetailInfos">
               <img src="@/assets/dtt/price.png" alt="">
-              <p>{{ houses[`${id}`].price }}</p>
+              <p>{{ Housez()[`${id}`].price }}</p>
               <img src="@/assets/dtt/size.png" alt="">
-              <p>{{ houses[`${id}`].size }}</p>
+              <p>{{ Housez()[`${id}`].size }}</p>
               <img src="@/assets/dtt/construction.png" alt="">
-              <p>{{ houses[`${id}`].constructionYear }}</p>
+              <p>{{ Housez()[`${id}`].constructionYear }}</p>
             </div>
             <div class="DetailExtraInfos">
               <img src="@/assets/dtt/bed.png" alt="">
-              <p>{{ houses[`${id}`].rooms.bedrooms}}</p>
+              <p>{{ Housez()[`${id}`].rooms.bedrooms }}</p>
               <img src="@/assets/dtt/bath.png" alt="">
-              <p>{{ houses[`${id}`].rooms.bathrooms }}</p>
+              <p>{{ Housez()[`${id}`].rooms.bathrooms }}</p>
               <img src="@/assets/dtt/garage.png" alt="">
-              <p>{{ houses[`${id}`].hasGarage }}</p>
+              <p>{{ Housez()[`${id}`].hasGarage }}</p>
             </div>
             <div class="DetailDescription">
-              <p class="DetailDescriptionText"> {{ houses[`${id}`].description }} </p>
+              <p class="DetailDescriptionText"> {{ Housez()[`${id}`].description }} </p>
             </div>
           </div>
         </div>
         <div class="Recommended">
           <h3 class="RecommendedTitel">Recommended for you</h3>
-          <div class="RecommendedContainer" v-for="house in houses.slice(0, 3)" :key="house.id">
-            <router-link :to="`/home/detail/${ house.id }`" style="text-decoration: none;">
-            <div class="RecommendedInfo">
-              <div class="RecommendedImg">
-                <img :src="house.image" alt="house-img" class="RecommendedHouse" />
-              </div>
-              <div class="RecommendeDetail">
-                <h3 class="RecommendedStreet">{{ house.location.street }}</h3>
-                <p class="RecommendedPrice">{{ house.price }}</p>
-                <p class="RecommendedZipcode">{{ house.location.zip }} {{ house.location.city }}</p>
-                <div class="RecommendedDetail">
-                  <img src="@/assets/dtt/bed.png" alt="">
-                  <p>{{ house.rooms.bedrooms }}</p>
-                  <img src="@/assets/dtt/bath.png" alt="">
-                  <p>{{ house.rooms.bathrooms }}</p>
-                  <img src="@/assets/dtt/size.png" alt="">
-                  <p>{{ house.size }}</p>
+          <div class="RecommendedContainer" v-for="house in Housez().slice(0, 3)" :key="house.id">
+            <router-link :to="`/home/detail/${house.id}`" style="text-decoration: none;">
+              <div class="RecommendedInfo">
+                <div class="RecommendedImg">
+                  <img :src="house.image" alt="house-img" class="RecommendedHouse" />
+                </div>
+                <div class="RecommendeDetail">
+                  <h3 class="RecommendedStreet">{{ house.location.street }}</h3>
+                  <p class="RecommendedPrice">{{ house.price }}</p>
+                  <p class="RecommendedZipcode">{{ house.location.zip }} {{ house.location.city }}</p>
+                  <div class="RecommendedDetail">
+                    <img src="@/assets/dtt/bed.png" alt="">
+                    <p>{{ house.rooms.bedrooms }}</p>
+                    <img src="@/assets/dtt/bath.png" alt="">
+                    <p>{{ house.rooms.bathrooms }}</p>
+                    <img src="@/assets/dtt/size.png" alt="">
+                    <p>{{ house.size }}</p>
+                  </div>
                 </div>
               </div>
-            </div>
             </router-link>
           </div>
         </div>
@@ -112,21 +137,17 @@ export default {
   </main>
 </template>
 <style scoped>
-a.router-link-exact-active {
-  color: var(--primary-text);
-}
-
 .MainDetail {
   display: flex;
   flex-direction: column;
   margin-left: 15%;
   margin-top: 40px;
-  width: 70%;
-  height: 850px;
+  max-width: 70%;
+  min-height: 850px;
 }
 
 .back {
-  width: 20px;
+  max-width: 20px;
   height: 20px;
 }
 
@@ -141,7 +162,7 @@ a.router-link-exact-active {
   font-weight: 400;
   color: var(--text1);
   margin-left: 10px;
-  margin-top: 0px;
+  margin-top: 1px;
 }
 
 .mobilEdit img {
@@ -155,14 +176,14 @@ a.router-link-exact-active {
 
 .Detail {
   background: var(--background2);
-  width: 60%;
+  max-width: 650px;
   display: flex;
   flex-direction: column;
 }
 
 
 .Detailhouse {
-  width: 100%;
+  max-width: 100%;
 }
 
 .DetailInfo {
@@ -173,7 +194,7 @@ a.router-link-exact-active {
   color: var(--primary-text);
   font-weight: 400;
   font-size: 15px;
-  width: 90%;
+  max-width: 90%;
 }
 
 .DetailStreet {
@@ -185,8 +206,8 @@ a.router-link-exact-active {
 }
 
 .DetailLocation {
-  width: 12px;
-  height: 15px;
+  max-width: 12px;
+  min-height: 15px;
   margin-right: 10px;
 }
 
@@ -201,8 +222,8 @@ a.router-link-exact-active {
 }
 
 .DetailInfos img {
-  width: 15px;
-  height: 15px;
+  max-width: 15px;
+  min-height: 15px;
 }
 
 .DetailInfos p {
@@ -219,8 +240,8 @@ a.router-link-exact-active {
 }
 
 .DetailExtraInfos img {
-  width: 15px;
-  height: 15px;
+  max-width: 15px;
+  min-height: 15px;
 }
 
 .DetailExtraInfos p {
@@ -240,7 +261,7 @@ a.router-link-exact-active {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 100%;
+  max-width: 100%;
 
 }
 
@@ -249,8 +270,8 @@ a.router-link-exact-active {
 }
 
 .DetailEdit img {
-  width: 20px;
-  height: 20px;
+  max-width: 20px;
+  min-height: 20px;
   padding: 10px;
 }
 
@@ -258,7 +279,7 @@ a.router-link-exact-active {
   margin-top: -18px;
   display: flex;
   flex-direction: column;
-  width: 35%;
+  max-width: 250px;
   white-space: nowrap;
 }
 
@@ -270,8 +291,8 @@ a.router-link-exact-active {
 }
 
 .RecommendedContainer {
-  width: 320px;
-  height: 130px;
+  max-width: 320px;
+  min-height: 130px;
   display: flex;
   flex-direction: row;
   background: var(--background2);
@@ -290,8 +311,8 @@ a.router-link-exact-active {
 }
 
 .RecommendedHouse {
-  width: 100px;
-  height: 100px;
+  max-width: 100px;
+  min-height: 100px;
   object-fit: cover;
   object-position: left;
   border-radius: 10px;
@@ -331,8 +352,8 @@ a.router-link-exact-active {
 }
 
 .RecommendedDetail img {
-  width: 15px;
-  height: 15px;
+  max-width: 15px;
+  min-height: 15px;
 }
 
 .RecommendedDetail p {
@@ -343,16 +364,23 @@ a.router-link-exact-active {
   padding-left: 10px;
   padding-right: 10px;
 }
+
 .backgroundimg {
   display: none;
 }
+
+a.router-link-exact-active {
+  color: var(--primary-text);
+}
+
+
 
 
 @media screen and (max-width: 750px) {
   .MainDetail {
     margin-top: 0;
     margin-left: 0%;
-    width: 100%;
+    max-width: 100%;
   }
 
   .backgroundimg {
@@ -361,12 +389,12 @@ a.router-link-exact-active {
     justify-content: space-between;
     background-repeat: no-repeat;
     background-size: 100%;
-    height: 25%;
+    min-height: 230px;
   }
 
   .DetailContainer {
-    width: 100%;
-    height: 50%;
+    max-width: 100%;
+    min-height: 50%;
     margin-top: -15px;
     display: flex;
     flex-direction: column;
@@ -374,7 +402,7 @@ a.router-link-exact-active {
   }
 
   .Detail {
-    width: 100%;
+    max-width: 100%;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
   }
@@ -386,6 +414,7 @@ a.router-link-exact-active {
   .Goback-mob {
     align-items: baseline;
   }
+
   .Goback {
     display: none;
   }
@@ -399,8 +428,8 @@ a.router-link-exact-active {
 
   #back-white {
     display: block;
-    width: 15px;
-    height: 15px;
+    max-width: 15px;
+    min-height: 15px;
     margin-left: 20px;
     margin-top: 50px;
   }
@@ -414,11 +443,11 @@ a.router-link-exact-active {
   .mobilEdit img {
     display: block;
     height: 20px;
-    padding: 10px;
+    padding: 7px;
   }
 
   .Recommended {
-    width: 80%;
+    max-width: 80%;
     margin: auto;
   }
 
@@ -429,5 +458,4 @@ a.router-link-exact-active {
   .DetailInfo {
     font-size: 15px;
   }
-}
-</style>
+}</style>
