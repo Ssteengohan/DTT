@@ -9,9 +9,9 @@ export default {
   },
   setup(props) {
     //Get id from url
-    const route = useRoute();
-    const id = route.params.id - 2;
-    const ids = route.params.id;
+    const router = useRoute();
+    const id = router.params.id - 2;
+    const ids = router.params.id;
 
     const store = useHouseStore();
 
@@ -30,12 +30,25 @@ export default {
       Housez,
       id,
       ids,
+      showDeletePopup,
+      router,
     }
   },
-  methods: {//Delete house
+  methods: {  
     onDeleteClick(id) {
-      showDeletePopup(id, this.handleDelete);
+      showDeletePopup(id, this.handleDelete, this.router.push('/'));
+      
     },
+    handleDelete(id) {
+      this.store.deleteHouse(id)
+        .then(() => {
+          this.router.push('/');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
   },
 
   mounted() {
@@ -43,6 +56,7 @@ export default {
   },
 };
 </script>
+
 
 
 
@@ -58,8 +72,8 @@ export default {
         <div class="mobilEdit" v-if="ids > 11">
           <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"> <img src="@/assets/dtt/edit-white.png"
               alt="" class="edit-white" /></router-link>
-          <div @click.prevent="deleteHouse(Housez()[`${id}`].id)">
-          <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
+              <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
+            <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
           </div>
         </div>
       </div>
@@ -81,7 +95,7 @@ export default {
               <h3 class="DetailStreet">{{ Housez()[`${id}`].location.street }}</h3>
               <router-link v-if="ids > 11" :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"><img
                   src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
-              <div @click.prevent="deleteHouse(Housez()[`${id}`].id)">
+                <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
                   <img v-if="ids > 11" src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
             </div>
             </div>

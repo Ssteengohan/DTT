@@ -42,15 +42,21 @@ export default {
       const postStore = usePostStore();
       postStore.postHouses(this.newPost, this.image)
         .then(() => {
-          this.$router.push('/');
+          this.$router.push('/home');
+          this.reloadPage();
         })
         .catch((error) => {
           console.error(error);
         });
     },
+    reloadPage() {
+      location.reload();
+      this.$router.push('/home');
+    }
   },
 };
 </script>
+
 <template>
   <div class="bg">
     <div class="BackHome">

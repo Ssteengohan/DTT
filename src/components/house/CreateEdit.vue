@@ -41,7 +41,7 @@ export default {
             const id = this.$route.params.id;
             const payload = { EditHouse: this.EditPost, image: this.image };
             EditPostStore().EditHouses(id, payload)
-                .then((data) => {
+                .then(() => {
                     updateImg(id, this.image)
                         .then(() => {
                             this.$router.push('/');

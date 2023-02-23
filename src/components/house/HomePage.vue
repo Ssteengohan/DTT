@@ -8,15 +8,40 @@ export default {
   props: {
     house: Object,
   },
+  methods: {
+    reloadPage() {
+      location.reload();
+    },
+    onDeleteClick(id) {
+      showDeletePopup(id, this.handleDelete);
+    },
+    handleDelete(id) {
+      const store = useHouseStore();
+      store.deleteHouse(id)
+        .then(() => {
+          this.reloadPage();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    handleSubmit() {
+      const store = useHouseStore();
+      store.addHouse(this.newHouse)
+        .then(() => {
+          this.reloadPage();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  },
   setup(props) {
-
     const store = useHouseStore();
 
     const getHouses = () => {
       store.getHouses();
     };
-
-
 
     // Filtering houses
     const filteredHouses = computed(() => {
@@ -41,12 +66,6 @@ export default {
       searchText,
       showDeletePopup,
     }
-  },
-  methods: {
-    onDeleteClick(id) {
-      showDeletePopup(id, this.handleDelete);
-    },
-
   },
 
   mounted() {
