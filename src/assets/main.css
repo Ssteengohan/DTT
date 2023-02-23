@@ -12,3 +12,6 @@ body, html {
 .header {
   margin: 0;
 }
+.router-link-active.houses {
+  color: var(--primary-text);
+}

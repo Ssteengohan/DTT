@@ -1,5 +1,4 @@
 <script setup>
-
 </script>
 
 <template>
@@ -13,17 +12,19 @@
             class="logo"
             src="@/assets/dtt/dtt-logo.png"
           />
-          <RouterLink class="houses" to="/">Houses</RouterLink>
+          <div class="routes">
+          <router-link class="houses" :to="{ name: 'home' }">Houses</router-link>
           <RouterLink class="about" to="/about">About</RouterLink>
+        </div>
         </nav>
       </div>
     </div>
     <div class="mobile-wrapper">
       <div class="mobile-navbar">
         <nav>
-          <RouterLink class="houses" to="/"
+          <RouterLink class="houses" :to="{ name: 'home' }"
             ><img
-              v-if="$route.name == 'home'"
+              v-if="$route.name == 'home' || $route.name == 'detail' || $route.name == 'edit' || $route.name == 'create'"
               class="home"
               src="@/assets/dtt/home-red.png" /><img
               v-else
@@ -43,7 +44,6 @@
       </div>
     </div>
   </header>
-
   <RouterView />
 </template>
 
@@ -60,25 +60,27 @@
 
   .mobile-wrapper {
     display: block;
-    display: flex;
-    align-items: center;
     background-color: var(--background2);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 9999;
-    width: 100%;
-    height: 60px;
+    max-width: 100%;
+    min-height: 60px;
   }
-  .home,
-  .infoButton {
-    width: 5vw;
+  .mobile-navbar {
+    width: 100%;
+  }
+  nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .home, .infoButton {
+    max-width: 35px;
     align-items: center;
     top: 10px;
-  }
-  .infoButton {
-    margin-left: 100px;
   }
 }
 nav {
@@ -102,9 +104,9 @@ nav {
   display: flex;
 }
 
-.houses,
-.about {
-  margin-left: 40px;
+.routes, .houses , .about {
+  margin-top: 15px;
+  margin-left: 20px;
   font-size: 15px;
   font-family: var(--font-family);
   font-weight: 700;
@@ -112,7 +114,7 @@ nav {
   text-decoration: none;
 }
 .about {
-  padding-left: 20px;
+  padding-left: 25px;
 }
 
 a.router-link-exact-active {

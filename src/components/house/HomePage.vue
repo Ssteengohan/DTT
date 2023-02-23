@@ -1,29 +1,73 @@
 <script>
-import { useHousesStore } from "@/stores/data-fetching.js";
+import { useHouseStore } from '@/stores/api.js';
+import { searchText } from '@/components/house/HeaderHomePage.vue';
+import { showDeletePopup } from '@/stores/delete.js';
+import { computed } from 'vue';
 
 export default {
-  setup() {
-    const { houses, fetchHouses } = useHousesStore()
+  props: {
+    house: Object,
+  },
+  setup(props) {
+
+    const store = useHouseStore();
+
+    const getHouses = () => {
+      store.getHouses();
+    };
+
+
+
+    // Filtering houses
+    const filteredHouses = computed(() => {
+      return store.houses.filter(house => {
+        const street = house.location.street.toLowerCase();
+        const city = house.location.city.toLowerCase();
+        const search = searchText.value.toLowerCase();
+        return street.includes(search) || city.includes(search);
+      });
+    });
+
+    // If no houses are found after filtering show message to user 
+    const showEmptyHouse = computed(() => {
+      return filteredHouses.value.length === 0 && searchText.value !== '';
+    })
 
     return {
-      houses,
-      fetchHouses
+      store,
+      getHouses,
+      filteredHouses,
+      showEmptyHouse,
+      searchText,
+      showDeletePopup,
     }
   },
-  created() {
-    this.fetchHouses()
-  }
-}
+  methods: {
+    onDeleteClick(id) {
+      showDeletePopup(id, this.handleDelete);
+    },
+
+  },
+
+  mounted() {
+    this.getHouses();
+  },
+};
 </script>
+
 
 <template>
   <main>
-    <div class="MainPost" v-for="house in houses" :key="house.id">
-      <p class="hidden">{{ house.id  }}</p>
-      <router-link :to="`/home/detail/${ house.id }`" style="text-decoration: none; width: 100%">
+
+    <h1 v-if="searchText && filteredHouses.length">
+      <span v-if="filteredHouses.length">{{ filteredHouses.length }}</span> results found
+    </h1>
+    <div class="MainPost" v-for="(house, index) in filteredHouses" :key="house.id">
+      <p class="hidden">{{ index + 2 }}</p>
+      <router-link :to="{ name: 'detail', params: { id: index + 2 } }" style="text-decoration: none; width: 100%">
         <div class="PostInfo">
           <div class="postImg">
-            <img  :src="house.image" alt="" class="houseImg" />
+            <img :src="house.image" alt="" class="houseImg" />
           </div>
           <div class="PostDetail">
             <h3 class="street">{{ house.location.street }}</h3>
@@ -38,28 +82,50 @@ export default {
               <p>{{ house.size }}</p>
             </div>
           </div>
-          <div class="postEdit">
-            <router-link :to="`/home/edit/${ house.id }`" style="text-decoration: none;" > <img src="@/assets/dtt/edit-red.png" alt="" class="edit" /></router-link>  
-            <img src="@/assets/dtt/delete.png" alt="" class="delete" />
+          <div class="postEdit" v-if="house.id > 11">
+            <router-link :to="{ name: 'edit', params: { id: house.id } }">
+              <img src="@/assets/dtt/edit-red.png" alt="" class="edit" />
+            </router-link>
+            <div @click.prevent="showDeletePopup(house.id)">
+              <img src="@/assets/dtt/delete.png" alt="" style="width: 20px; height: 20px;" class="delete" />
+            </div>
           </div>
         </div>
       </router-link>
     </div>
+    <div id="img" v-if="showEmptyHouse">
+      <img src="@/assets/dtt/empty-house.png" alt="">
+      <p>No result found.</p>
+      <p>Please try another keyword.</p>
+    </div>
   </main>
 </template>
+
+
+
 
 <style scoped>
 .hidden {
   display: none;
 }
+
 .MainPost {
   display: flex;
   cursor: pointer;
   background-color: var(--background2);
-  width: 70%;
+  max-width: 70%;
   margin-top: 20px;
   margin-left: 15%;
   border-radius: 10px;
+}
+
+h1 {
+  padding-top: 3px;
+  margin-left: 15%;
+  font-size: 15px;
+  font-family: var(--font-family);
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
 .PostInfo {
@@ -70,8 +136,8 @@ export default {
 
 .postImg img {
   border-radius: 10px;
-  height: 140px;
-  width: 140px;
+  min-height: 140px;
+  max-width: 140px;
   object-fit: cover;
   object-position: left;
 }
@@ -127,14 +193,33 @@ export default {
 }
 
 .edit {
-  padding-right: 10px;
-  height: 20px; 
+  padding-right: 5px;
+  max-height: 20px;
+}
+
+#img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  color: var(--secondary-text);
+  font-weight: 400;
+}
+
+#img img {
+  max-width: 400px;
+  margin-top: 40px;
+}
+
+#img p:nth-child(3) {
+  margin-top: -18px;
 }
 
 @media screen and (max-width: 750px) {
   .MainPost {
-    width: 95%;
-    margin-left: 0;
+    max-width: 83%;
+    margin-left: 50px;
   }
 
   .postImg img {
@@ -144,6 +229,7 @@ export default {
 
   .street {
     font-size: 15px;
+    white-space: nowrap;
   }
 
   .housePrice,
@@ -170,7 +256,7 @@ export default {
   }
 
   .postEdit {
-    max-width: 20%;
+    max-width: 10%;
     height: 15px;
   }
 }
