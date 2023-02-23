@@ -8,6 +8,7 @@ export default {
     house: Object,
   },
   setup(props) {
+    //Get id from url
     const route = useRoute();
     const id = route.params.id - 2;
     const ids = route.params.id;
@@ -31,7 +32,7 @@ export default {
       ids,
     }
   },
-  methods: {
+  methods: {//Delete house
     onDeleteClick(id) {
       showDeletePopup(id, this.handleDelete);
     },
