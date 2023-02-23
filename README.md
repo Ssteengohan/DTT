@@ -7,7 +7,7 @@
 git clone https://github.com/Ssteengohan/DTT.git
 
 ### Change directory
-cd DTT-assessment
+cd DTT
 
 ### Download packages and dependencies
 npm install

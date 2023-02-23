@@ -1,5 +1,6 @@
 // This file contains the code for the delete houses
 import { useHouseStore } from '@/stores/api.js';
+
 export const showDeletePopup = (id) => {
     const store = useHouseStore();
     const popup = document.createElement('div');
