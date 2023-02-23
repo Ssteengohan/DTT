@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-
+//eveything with api is in this file
 //Api key
 const myHeaders = new Headers();
 myHeaders.append('X-Api-Key', 'P8v4swpqKDBnkj3HZbSYoFRielzmW6au');
