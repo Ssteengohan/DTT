@@ -1,4 +1,4 @@
-// This file contains the code for the delete houses
+// This file contains the code for the delete popup
 import { useHouseStore } from '@/stores/api.js';
 
 export const showDeletePopup = (id) => {
