@@ -4,14 +4,10 @@ import { useRoute } from 'vue-router';
 import { showDeletePopup } from '@/stores/delete.js';
 
 export default {
-  props: {
-    house: Object,
-  },
-  setup(props) {
+  setup() {
     //Get id from url
     const router = useRoute();
     const id = router.params.id - 2;
-    const ids = router.params.id;
 
     const store = useHouseStore();
 
@@ -29,7 +25,6 @@ export default {
       getHouses,
       Housez,
       id,
-      ids,
       showDeletePopup,
       router,
     }
@@ -69,7 +64,7 @@ export default {
             <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
           </router-link>
         </div>
-        <div class="mobilEdit" v-if="ids > 11">
+        <div class="mobilEdit" v-if="id == 10">
           <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"> <img src="@/assets/dtt/edit-white.png"
               alt="" class="edit-white" /></router-link>
               <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
@@ -91,12 +86,12 @@ export default {
             <img :src="Housez()[`${id}`].image" alt="house-img" class="Detailhouse" />
           </div>
           <div class="DetailInfo">
-            <div class="DetailEdit">
+            <div class="DetailEdit" v-if="id == 10">
               <h3 class="DetailStreet">{{ Housez()[`${id}`].location.street }}</h3>
-              <router-link v-if="ids > 11" :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"><img
+              <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"><img
                   src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
                 <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
-                  <img v-if="ids > 11" src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
+                  <img src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
             </div>
             </div>
             <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">{{

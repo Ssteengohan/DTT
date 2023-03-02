@@ -1,5 +1,7 @@
 <script>
 import { ref, computed } from 'vue'
+import { useHouseStore } from '@/stores/api.js';
+
 //Looking if the search input is empty or not if it is empty the clear icon will not show up 
 const searchText = ref('')
 const showClearIcon = computed(() => searchText.value !== '')
@@ -7,6 +9,16 @@ const showClearIcon = computed(() => searchText.value !== '')
 function clearInput() {
     searchText.value = ''
 }
+//Sorting the houses by price and size
+function sortPrice() {
+    const store = useHouseStore();
+    store.houses.sort((a, b) => b.price - a.price);
+}
+function sortSize() {
+    const store = useHouseStore();
+    store.houses.sort((a, b) => b.size - a.size);
+}
+
 
 export { searchText }
 
@@ -14,6 +26,8 @@ export default {
     setup() {
 
         return {
+            sortSize,
+            sortPrice,
             searchText,
             showClearIcon,
             clearInput
@@ -46,8 +60,8 @@ export default {
                         @input="showClearIcon = true" />
                 </div>
                 <div class="filter">
-                    <button class="price">Price</button>
-                    <button class="size">Size</button>
+                    <button class="price" @click="sortPrice()">Price</button>
+                    <button class="size" @click="sortSize()">Size</button>
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+
 <script>
 import { useHouseStore } from '@/stores/api.js';
 import { searchText } from '@/components/house/HeaderHomePage.vue';
@@ -5,43 +6,14 @@ import { showDeletePopup } from '@/stores/delete.js';
 import { computed } from 'vue';
 
 export default {
-  props: {
-    house: Object,
-  },
-  methods: {
-    reloadPage() {
-      location.reload();
-    },
-    onDeleteClick(id) {
-      showDeletePopup(id, this.handleDelete);
-    },
-    handleDelete(id) {
-      const store = useHouseStore();
-      store.deleteHouse(id)
-        .then(() => {
-          this.reloadPage();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    handleSubmit() {
-      const store = useHouseStore();
-      store.addHouse(this.newHouse)
-        .then(() => {
-          this.reloadPage();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  },
-  setup(props) {
+  setup() {
+
     const store = useHouseStore();
 
     const getHouses = () => {
       store.getHouses();
     };
+
 
     // Filtering houses
     const filteredHouses = computed(() => {
@@ -67,13 +39,17 @@ export default {
       showDeletePopup,
     }
   },
+  methods: {// Delete house
+    onDeleteClick(id) {
+      showDeletePopup(id, this.handleDelete);
+    },
+  },
 
   mounted() {
     this.getHouses();
   },
 };
 </script>
-
 
 <template>
   <main>
@@ -83,7 +59,7 @@ export default {
     </h1>
     <div class="MainPost" v-for="(house, index) in filteredHouses" :key="house.id">
       <p class="hidden">{{ index + 2 }}</p>
-      <router-link :to="{ name: 'detail', params: { id: index + 2 } }" style="text-decoration: none; width: 100%">
+      <router-link :to="{ name: 'detail', params: { id: house.id > 11 ? index + 2 : house.id } }" style="text-decoration: none; width: 100%">
         <div class="PostInfo">
           <div class="postImg">
             <img :src="house.image" alt="" class="houseImg" />

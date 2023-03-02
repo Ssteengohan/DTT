@@ -42,7 +42,6 @@ export default {
       const postStore = usePostStore();
       postStore.postHouses(this.newPost, this.image)
         .then(() => {
-          this.$router.push('/home');
           this.reloadPage();
         })
         .catch((error) => {
@@ -50,8 +49,7 @@ export default {
         });
     },
     reloadPage() {
-      location.reload();
-      this.$router.push('/home');
+      location.reload('/');
     }
   },
 };
@@ -106,12 +104,13 @@ export default {
         <div class="one">
           <label for="price">Price*</label>
           <input type="text" v-model="newPost.price" placeholder="e.g. €150.000 " required pattern="\d+(\.\d{1,2})?"
-            title="Has to be a number" />
+            title="Has to be a number with no spaces"/>
         </div>
         <div class="two">
           <div class="first" id="een">
             <label for="size">Size*</label>
-            <input type="text" v-model="newPost.size" placeholder="e.g. 60m2" required pattern="\d+(\.\d{1,2})?" />
+            <input type="text" v-model="newPost.size" placeholder="e.g. 60m2" required pattern="\d+(\.\d{1,2})?"
+            title="Has to be a number with no spaces" />
           </div>
           <div class="second" id="twee">
             <label for="hasGarage">Has garage*</label>
@@ -125,17 +124,19 @@ export default {
         <div class="two">
           <div class="first">
             <label for="bedrooms">Bedrooms*</label>
-            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required />
+            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required 
+            title="Has to be a number with no spaces"/>
           </div>
           <div class="sec">
             <label for="bathrooms">Bathrooms*</label>
-            <input type="text" v-model="newPost.bathrooms" placeholder="Enter amount" required />
+            <input type="text" v-model="newPost.bathrooms" placeholder="Enter amount" required
+            title="Has to be a number with no spaces" />
           </div>
         </div>
         <div class="one">
           <label for="constructionYear">Construction year*</label>
           <input type="text" v-model="newPost.constructionYear" placeholder="e.g. 1980" required
-            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940" />
+            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940"/>
         </div>
         <div class="one">
           <label for="description">Description*</label>

@@ -1,6 +1,7 @@
 <script>
 import { EditPostStore, updateImg } from '@/stores/api.js';
 
+
 export default {
     data() {
         return {
@@ -57,14 +58,11 @@ export default {
     },
 };
 </script>
-
-
-
 <template>
     <div class="bg">
         <div class="BackHome">
-                <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
-                <p class="PBack">Back to overview</p>  
+            <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+            <p class="PBack">Back to overview</p>
         </div>
         <div class="post-form">
             <h1>Edit listing</h1>
@@ -88,18 +86,20 @@ export default {
                 <div class="one">
                     <label for="zip">Postal code*</label>
                     <input type="text" v-model="EditPost.zip" placeholder="e.g. 1000 AA" required
-                        pattern="[0-9]{4}\s?[a-zA-Z]{2}" title="Has to be atleast 4 digits a space and 2 letters and leave no spaces " />
+                        pattern="[0-9]{4}\s?[a-zA-Z]{2}"
+                        title="Has to be atleast 4 digits a space and 2 letters and leave no spaces " />
                 </div>
                 <div class="one">
                     <label for="city">City*</label>
                     <input type="text" v-model="EditPost.city" placeholder="e.g. Utrecht" required pattern="[a-zA-Z]+"
                         title="Has to be a letter and leave no spaces" />
                 </div>
+                <label>Upload picture (PNG or JPG)</label>
                 <div class="img">
                     <img class="preview" v-if="url" :src="url" />
                     <img src="@/assets/dtt/clear-white.png" class="clear" alt="clear" v-if="url" @click="handleClear" />
                     <div class="upload" v-else>
-                        <label>Upload picture (PNG or JPG)</label>
+                        
                         <label id="box" for="image">
                             <img class="plus" src="@/assets/dtt/plus.png" alt="plus">
                         </label>
@@ -116,7 +116,7 @@ export default {
                     <div class="first" id="een">
                         <label for="size">Size*</label>
                         <input type="text" v-model="EditPost.size" placeholder="e.g. 60m2" required
-                            pattern="\d+(\.\d{1,2})?"  title="Has to be a number and leave no spaces" />
+                            pattern="\d+(\.\d{1,2})?" title="Has to be a number and leave no spaces" />
                     </div>
                     <div class="second" id="twee">
                         <label for="hasGarage">Has garage*</label>
@@ -130,13 +130,13 @@ export default {
                 <div class="two">
                     <div class="first">
                         <label for="bedrooms">Bedrooms*</label>
-                        <input type="text" v-model="EditPost.bedrooms" placeholder="Enter amount" required 
-                        pattern="\d+(\.\d{1,2})?"  title="Has to be a number and leave no spaces"/>
+                        <input type="text" v-model="EditPost.bedrooms" placeholder="Enter amount" required
+                            pattern="\d+(\.\d{1,2})?" title="Has to be a number and leave no spaces" />
                     </div>
                     <div class="sec">
                         <label for="bathrooms">Bathrooms*</label>
-                        <input type="text" v-model="EditPost.bathrooms" placeholder="Enter amount" required 
-                        pattern="\d+(\.\d{1,2})?"  title="Has to be a number and leave no spaces"/>
+                        <input type="text" v-model="EditPost.bathrooms" placeholder="Enter amount" required
+                            pattern="\d+(\.\d{1,2})?" title="Has to be a number and leave no spaces" />
                     </div>
                 </div>
                 <div class="one">
@@ -208,7 +208,7 @@ h1 {
     flex-direction: column;
     margin-bottom: 1rem;
 }
- 
+
 label {
     padding-bottom: 10px;
 }
@@ -267,8 +267,8 @@ input[type="file"] {
 }
 
 .img .preview {
-    max-width: 100px;
-    min-height: 100px;
+    max-width: 110px;
+    min-height: 110px;
 }
 
 .clear {
