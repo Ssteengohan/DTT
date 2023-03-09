@@ -1,23 +1,39 @@
-
 <script>
-import { useHouseStore } from '@/stores/api.js';
-import { searchText } from '@/components/house/HeaderHomePage.vue';
-import { showDeletePopup } from '@/stores/delete.js';
-import { computed } from 'vue';
+import { useHouseStore } from "@/stores/api.js";
+import { searchText } from "@/components/house/HeaderHomePage.vue";
+import { computed, ref } from "vue";
+import DeletePopup from "@/components/house/DeletePopup.vue";
+
 
 export default {
   setup() {
-
     const store = useHouseStore();
 
     const getHouses = () => {
       store.getHouses();
     };
 
+    const showDeletePopup = ref(false);
+    const house = ref({}); // initialize house to an empty object
+
+    const onCancelDelete = () => {
+      showDeletePopup.value = false;
+      house.value = {}; // reset house to an empty object
+    };
+
+    const onConfirmDelete = () => {
+      // Delete the house
+      store.deleteHouse(house.value.id);
+
+      // Hide the popup
+      showDeletePopup.value = false;
+      house.value = {}; // reset house to an empty object
+      getHouses();
+    };
 
     // Filtering houses
     const filteredHouses = computed(() => {
-      return store.houses.filter(house => {
+      return store.houses.filter((house) => {
         const street = house.location.street.toLowerCase();
         const city = house.location.city.toLowerCase();
         const search = searchText.value.toLowerCase();
@@ -25,41 +41,58 @@ export default {
       });
     });
 
-    // If no houses are found after filtering show message to user 
+    // If no houses are found after filtering show message to user
     const showEmptyHouse = computed(() => {
-      return filteredHouses.value.length === 0 && searchText.value !== '';
-    })
+      return filteredHouses.value.length === 0 && searchText.value !== "";
+    });
+
+    const getPrice = () => {
+      store.SorthousesbyPrice();
+    };
+
+    // Method to show delete popup
+    const onDeleteClick = (houseId) => {
+      house.value = { id: houseId };
+      showDeletePopup.value = true;
+    };
 
     return {
       store,
       getHouses,
+      showDeletePopup,
+      onCancelDelete,
+      onConfirmDelete,
+      house,
       filteredHouses,
       showEmptyHouse,
       searchText,
-      showDeletePopup,
-    }
-  },
-  methods: {// Delete house
-    onDeleteClick(id) {
-      showDeletePopup(id, this.handleDelete);
-    },
+      getPrice,
+      onDeleteClick,
+    };
   },
 
-  mounted() {
+  created() {
     this.getHouses();
+    this.getPrice();
+  },
+
+  components: {
+    DeletePopup, // Import the DeletePopup component here
   },
 };
 </script>
 
 <template>
   <main>
-
     <h1 v-if="searchText && filteredHouses.length">
-      <span v-if="filteredHouses.length">{{ filteredHouses.length }}</span> results found
+      <span v-if="filteredHouses.length">{{ filteredHouses.length }}</span>
+      results found
     </h1>
-    <div class="MainPost" v-for="(house, index) in filteredHouses" :key="house.id">
-      <p class="hidden">{{ index + 2 }}</p>
-      <router-link :to="{ name: 'detail', params: { id: house.id > 11 ? index + 2 : house.id } }" style="text-decoration: none; width: 100%">
+    <div class="MainPost" v-for="house in filteredHouses" :key="house.id">
+      <router-link
+        :to="{ name: 'detail', params: { id: house.id } }"
+        style="text-decoration: none; width: 100%"
+      >
         <div class="PostInfo">
           <div class="postImg">
             <img :src="house.image" alt="" class="houseImg" />
@@ -67,7 +100,9 @@ export default {
           <div class="PostDetail">
             <h3 class="street">{{ house.location.street }}</h3>
             <p class="housePrice">€ {{ house.price }}</p>
-            <p class="ZipCode">{{ house.location.zip }} {{ house.location.city }}</p>
+            <p class="ZipCode">
+              {{ house.location.zip }} {{ house.location.city }}
+            </p>
             <div class="info">
               <img class="bed" src="@/assets/dtt/bed.png" alt="bed-logo" />
               <p>{{ house.rooms.bedrooms }}</p>
@@ -77,33 +112,36 @@ export default {
               <p>{{ house.size }}</p>
             </div>
           </div>
-          <div class="postEdit" v-if="house.id > 11">
+          <div class="postEdit" v-if="house.madeByMe">
             <router-link :to="{ name: 'edit', params: { id: house.id } }">
               <img src="@/assets/dtt/edit-red.png" alt="" class="edit" />
             </router-link>
-            <div @click.prevent="showDeletePopup(house.id)">
-              <img src="@/assets/dtt/delete.png" alt="" style="width: 20px; height: 20px;" class="delete" />
+            <div @click.prevent="onDeleteClick(house.id)">
+              <img
+                src="@/assets/dtt/delete.png"
+                alt=""
+                style="width: 20px; height: 20px"
+                class="delete"
+              />
             </div>
           </div>
         </div>
       </router-link>
     </div>
     <div id="img" v-if="showEmptyHouse">
-      <img src="@/assets/dtt/empty-house.png" alt="">
+      <img src="@/assets/dtt/empty-house.png" alt="" />
       <p>No result found.</p>
       <p>Please try another keyword.</p>
     </div>
+    <DeletePopup
+      v-if="showDeletePopup"
+      @cancel="onCancelDelete"
+      @confirm="onConfirmDelete"
+    />
   </main>
 </template>
 
-
-
-
 <style scoped>
-.hidden {
-  display: none;
-}
-
 .MainPost {
   display: flex;
   cursor: pointer;
@@ -201,6 +239,9 @@ h1 {
   color: var(--secondary-text);
   font-weight: 400;
 }
+#img p {
+  margin-top: 26px;
+}
 
 #img img {
   max-width: 400px;
@@ -213,8 +254,15 @@ h1 {
 
 @media screen and (max-width: 750px) {
   .MainPost {
-    max-width: 83%;
-    margin-left: 50px;
+    max-width: 90%;
+    margin: 0 auto;
+    margin-bottom: 15px;
+  }
+
+  .MainPost:last-child {
+    border-bottom-width: 60px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--background);
   }
 
   .postImg img {
@@ -253,6 +301,34 @@ h1 {
   .postEdit {
     max-width: 10%;
     height: 15px;
+  }
+
+  .delete,
+  .edit {
+    height: 15px !important;
+    width: 15px !important;
+  }
+
+  #img {
+    margin: 0 auto;
+    width: 90%;
+
+  }
+  #img p {
+    font-size: 12px;
+  }
+
+  #img img {
+    width: 90%;
+  }
+
+  h1 {
+    margin-left: 6%;
+  }
+}
+@media screen and (max-width: 350px) {
+  .postEdit {
+    margin-left: -20px;
   }
 }
 </style>

@@ -1,126 +1,154 @@
 <script>
-import { useHouseStore } from '@/stores/api.js';
-import { useRoute } from 'vue-router';
-import { showDeletePopup } from '@/stores/delete.js';
+import { useHouseStore } from "@/stores/api.js";
+import { useRoute } from "vue-router";
+import { computed, watch, ref } from "vue";
+import DeletePopup from "@/components/house/DeletePopup.vue";
 
 export default {
-  setup() {
-    //Get id from url
-    const router = useRoute();
-    const id = router.params.id - 2;
+  components: {
+    DeletePopup,
+  },
 
+  setup() {
+    const router = useRoute();
+    const id = computed(() => router.params.id);
     const store = useHouseStore();
+    const showDeletePopup = ref(false);
+    const houseToDelete = ref({});
 
     const getHouses = () => {
       store.getHouses();
-    }
-  
-    //Get houses
-    const Housez = () => {
-      return store.houses;
-    }
+    };
+
+
+    const deleteHouse = (id) => {
+      store.deleteHouse(id);
+      getHouses();
+      router.push('/');
+    };
+
+
+    const onCancelDelete = () => {
+      showDeletePopup.value = false;
+      houseToDelete.value = {};
+    };
+
+    const onConfirmDelete = () => {
+      deleteHouse(houseToDelete.value.id);
+      onCancelDelete();
+    };
+
+    const house = computed(() => {
+      return store.houses.find((house) => house.id.toString() === id.value.toString());
+    });
+
+    const recommendedHouses = computed(() => {
+      const currentIndex = store.houses.findIndex((h) => h.id === house.value.id);
+      const nextHouses = store.houses.slice(currentIndex + 1).concat(store.houses.slice(0, currentIndex + 1));
+      return nextHouses.slice(0, 3);
+    });
+
+    watch(id, () => {
+      getHouses();
+    });
+
+    const onDeleteClick = (houseId) => {
+      houseToDelete.value = { id: houseId };
+      showDeletePopup.value = true;
+    };
 
     return {
+      showDeletePopup,
+      houseToDelete,
+      onCancelDelete,
+      onConfirmDelete,
+      deleteHouse,
       store,
       getHouses,
-      Housez,
-      id,
-      showDeletePopup,
-      router,
-    }
-  },
-  methods: {  
-    onDeleteClick(id) {
-      showDeletePopup(id, this.handleDelete, this.router.push('/'));
-      
-    },
-    handleDelete(id) {
-      this.store.deleteHouse(id)
-        .then(() => {
-          this.router.push('/');
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-
+      house,
+      recommendedHouses,
+      onDeleteClick,
+    };
   },
 
-  mounted() {
+  created() {
     this.getHouses();
   },
 };
 </script>
 
 
-
-
 <template>
   <main>
-    <div class="MainDetail" v-if="Housez()[id]">
-      <div class="backgroundimg" :style="{ 'background-image': `url(${Housez()[`${id}`].image})` }">
+    <div class="MainDetail" v-if="house">
+      <div class="backgroundimg">
+        <img :src="house.image" alt="house-img" class="BackgroundImg" />
         <div class="Goback-mob">
-          <router-link style="text-decoration: none; display: flex; color: inherit;" to="/">
-            <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
+          <router-link style="text-decoration: none; color: inherit" to="/">
+            <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back" />
           </router-link>
         </div>
-        <div class="mobilEdit" v-if="id == 10">
-          <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"> <img src="@/assets/dtt/edit-white.png"
-              alt="" class="edit-white" /></router-link>
-              <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
-            <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white" />
+        <div class="mobilEdit" v-if="house.madeByMe">
+          <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none">
+            <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" /></router-link>
+          <div>
+            <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white"
+              @click.prevent="onDeleteClick(house.id)" />
           </div>
         </div>
       </div>
       <div class="Goback">
         <router-link
           style="text-decoration: none; display: flex; color: inherit; padding-bottom: 10px; flex-direction: row;" to="/">
-          <img src="@/assets/dtt/back.png" alt="back" id="back" class="back">
-          <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back">
+          <img src="@/assets/dtt/back.png" alt="back" id="back" class="back" />
+          <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back" />
           <h3 class="BackTo">Back to overview</h3>
         </router-link>
       </div>
       <div class="DetailContainer">
         <div class="Detail">
           <div class="DetailImg">
-            <img :src="Housez()[`${id}`].image" alt="house-img" class="Detailhouse" />
+            <img :src="house.image" alt="house-img" class="Detailhouse" />
           </div>
           <div class="DetailInfo">
-            <div class="DetailEdit" v-if="id == 10">
-              <h3 class="DetailStreet">{{ Housez()[`${id}`].location.street }}</h3>
-              <router-link :to="{ name: 'edit', params: { id: Housez()[`${id}`].id } }" style="text-decoration: none;"><img
-                  src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
-                <div @click.prevent="showDeletePopup(Housez()[`${id}`].id)">
-                  <img src="@/assets/dtt/delete.png" alt="" class="delete-detail" />
+            <div class="DetailEdit">
+              <h3 class="DetailStreet">{{ house.location.street }}</h3>
+              <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none"
+                v-if="house.madeByMe"><img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
+              <div v-if="house.madeByMe">
+                <img src="@/assets/dtt/delete.png" alt="" class="delete-detail"
+                  @click.prevent="onDeleteClick(house.id)" />
+              </div>
             </div>
-            </div>
-            <p class="DetailZipcode"> <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation">{{
-              Housez()[`${id}`].location.zip }} {{ Housez()[`${id}`].location.city }}</p>
+            <p class="DetailZipcode">
+              <img src="@/assets/dtt/location.png" alt="house-logo" class="DetailLocation" />{{ house.location.zip }} {{
+                house.location.city }}
+            </p>
             <div class="DetailInfos">
-              <img src="@/assets/dtt/price.png" alt="">
-              <p>{{ Housez()[`${id}`].price }}</p>
-              <img src="@/assets/dtt/size.png" alt="">
-              <p>{{ Housez()[`${id}`].size }}</p>
-              <img src="@/assets/dtt/construction.png" alt="">
-              <p>{{ Housez()[`${id}`].constructionYear }}</p>
+              <img src="@/assets/dtt/price.png" alt="" />
+              <p>{{ house.price }}</p>
+              <img src="@/assets/dtt/size.png" alt="" />
+              <p>{{ house.size }}</p>
+              <img src="@/assets/dtt/construction.png" alt="" />
+              <p>Built in {{ house.constructionYear }}</p>
             </div>
             <div class="DetailExtraInfos">
-              <img src="@/assets/dtt/bed.png" alt="">
-              <p>{{ Housez()[`${id}`].rooms.bedrooms }}</p>
-              <img src="@/assets/dtt/bath.png" alt="">
-              <p>{{ Housez()[`${id}`].rooms.bathrooms }}</p>
-              <img src="@/assets/dtt/garage.png" alt="">
-              <p>{{ Housez()[`${id}`].hasGarage }}</p>
+              <img src="@/assets/dtt/bed.png" alt="" />
+              <p>{{ house.rooms.bedrooms }}</p>
+              <img src="@/assets/dtt/bath.png" alt="" />
+              <p>{{ house.rooms.bathrooms }}</p>
+              <img src="@/assets/dtt/garage.png" alt="" />
+              <p>{{ house.hasGarage ? "Yes" : "No" }}</p>
             </div>
             <div class="DetailDescription">
-              <p class="DetailDescriptionText"> {{ Housez()[`${id}`].description }} </p>
+              <p class="DetailDescriptionText">{{ house.description }}</p>
             </div>
           </div>
         </div>
         <div class="Recommended">
           <h3 class="RecommendedTitel">Recommended for you</h3>
-          <div class="RecommendedContainer" v-for="house in Housez().slice(0, 3)" :key="house.id">
-            <router-link :to="`/home/detail/${house.id}`" style="text-decoration: none;">
+          <div class="RecommendedContainer" v-for="house in recommendedHouses" :key="house.id">
+            <router-link :to="{ name: 'detail', params: { id: house.id } }" style="text-decoration: none">
               <div class="RecommendedInfo">
                 <div class="RecommendedImg">
                   <img :src="house.image" alt="house-img" class="RecommendedHouse" />
@@ -128,13 +156,15 @@ export default {
                 <div class="RecommendeDetail">
                   <h3 class="RecommendedStreet">{{ house.location.street }}</h3>
                   <p class="RecommendedPrice">{{ house.price }}</p>
-                  <p class="RecommendedZipcode">{{ house.location.zip }} {{ house.location.city }}</p>
+                  <p class="RecommendedZipcode">
+                    {{ house.location.zip }} {{ house.location.city }}
+                  </p>
                   <div class="RecommendedDetail">
-                    <img src="@/assets/dtt/bed.png" alt="">
+                    <img src="@/assets/dtt/bed.png" alt="" />
                     <p>{{ house.rooms.bedrooms }}</p>
-                    <img src="@/assets/dtt/bath.png" alt="">
+                    <img src="@/assets/dtt/bath.png" alt="" />
                     <p>{{ house.rooms.bathrooms }}</p>
-                    <img src="@/assets/dtt/size.png" alt="">
+                    <img src="@/assets/dtt/size.png" alt="" />
                     <p>{{ house.size }}</p>
                   </div>
                 </div>
@@ -144,6 +174,7 @@ export default {
         </div>
       </div>
     </div>
+    <DeletePopup v-if="showDeletePopup" @cancel="onCancelDelete" @confirm="onConfirmDelete" />
   </main>
 </template>
 <style scoped>
@@ -164,7 +195,6 @@ export default {
 #back-white {
   display: none;
 }
-
 
 .BackTo {
   font-family: var(--font-family);
@@ -190,7 +220,6 @@ export default {
   display: flex;
   flex-direction: column;
 }
-
 
 .Detailhouse {
   max-width: 100%;
@@ -272,7 +301,6 @@ export default {
   flex-direction: row;
   align-items: center;
   max-width: 100%;
-
 }
 
 .DetailEdit h3 {
@@ -289,8 +317,9 @@ export default {
   margin-top: -18px;
   display: flex;
   flex-direction: column;
-  max-width: 250px;
+  width: 30%;
   white-space: nowrap;
+  margin-left: 9%;
 }
 
 .RecommendedTitel {
@@ -301,7 +330,7 @@ export default {
 }
 
 .RecommendedContainer {
-  max-width: 320px;
+  width: 320px;
   min-height: 130px;
   display: flex;
   flex-direction: row;
@@ -326,12 +355,10 @@ export default {
   object-fit: cover;
   object-position: left;
   border-radius: 10px;
-
 }
 
 .RecommendeDetail {
   padding-left: 10px;
-
 }
 
 .RecommendedStreet {
@@ -342,14 +369,14 @@ export default {
 }
 
 .RecommendedPrice {
-  font-size: 12px;
+  font-size: 10px;
   font-family: var(--font-family);
   color: var(--primary-text);
   font-weight: 400;
 }
 
 .RecommendedZipcode {
-  font-size: 12px;
+  font-size: 10px;
   font-family: var(--font-family);
   color: var(--tertiary2);
   font-weight: 400;
@@ -383,10 +410,7 @@ a.router-link-exact-active {
   color: var(--primary-text);
 }
 
-
-
-
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 650px) {
   .MainDetail {
     margin-top: 0;
     margin-left: 0%;
@@ -395,11 +419,12 @@ a.router-link-exact-active {
 
   .backgroundimg {
     display: block;
-    display: flex;
-    justify-content: space-between;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    min-height: 230px;
+    height: 300px;
+  }
+
+  .BackgroundImg {
+    width: 100%;
+    height: 100%;
   }
 
   .DetailContainer {
@@ -408,7 +433,6 @@ a.router-link-exact-active {
     margin-top: -15px;
     display: flex;
     flex-direction: column;
-
   }
 
   .Detail {
@@ -423,6 +447,7 @@ a.router-link-exact-active {
 
   .Goback-mob {
     align-items: baseline;
+    position: absolute;
   }
 
   .Goback {
@@ -438,27 +463,33 @@ a.router-link-exact-active {
 
   #back-white {
     display: block;
-    max-width: 15px;
-    min-height: 15px;
+    max-width: 23px;
+    min-height: 23px;
     margin-left: 20px;
-    margin-top: 50px;
+    margin-top: -280px;
   }
 
   .mobilEdit {
     display: flex;
-    margin-left: 20px;
-    margin-top: 40px;
+    right: 8px;
+    top: 18px;
+    position: absolute;
   }
 
   .mobilEdit img {
     display: block;
-    height: 20px;
+    height: 22px;
     padding: 7px;
   }
 
   .Recommended {
-    max-width: 80%;
-    margin: auto;
+    width: 90%;
+    margin: 0 auto;
+    height: 550px;
+  }
+
+  .RecommendedContainer {
+    width: 100%;
   }
 
   .DetailStreet {
@@ -467,5 +498,8 @@ a.router-link-exact-active {
 
   .DetailInfo {
     font-size: 15px;
+    margin: 0 auto;
+    width: 90%;
   }
-}</style>
+}
+</style>

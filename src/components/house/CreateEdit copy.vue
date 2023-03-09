@@ -82,24 +82,23 @@ export default {
                     if (!this.image) {
                         this.$router.push('/');
                         return;
-                    } else {
+                    } else { 
                         updateImg(id, this.image)
-                            .then(() => {
-                                this.$router.push('/');
-                            })
-                            .catch((error) => {
-                                console.error(error);
-                            });
-                    }
-
+                        .then(() => {
+                            this.$router.push('/');
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });}
+                  
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         },
     },
-
-    created() {
+    
+    mounted() {
         this.getHouses();
     },
 };
@@ -110,15 +109,11 @@ export default {
             <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
             <p class="PBack">Back to overview</p>
         </div>
-        <div class="MobBack">
-            <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
-            <h1>Edit listing</h1>
-        </div>
         <div class="post-form">
             <h1>Edit listing</h1>
             <form @submit.prevent="handleSubmit">
                 <div class="one">
-                    <label for="streetName">Title of listing*</label>
+                    <label for="streetName">Street name*</label>
                     <input type="text" v-model="EditPost.streetName" :placeholder="street" required pattern="[a-zA-Z]+"
                         title="Has to be a letter and leave no spaces" />
                 </div>
@@ -211,6 +206,13 @@ export default {
   
   
 <style scoped>
+.bg {
+    background-image: url("@/assets/dtt/background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 1140px;
+}
+
 .BackHome {
     margin-left: 15%;
     margin-top: 2rem;
@@ -220,10 +222,6 @@ export default {
     font-weight: 400;
     color: var(--text1);
     align-items: center;
-}
-
-.MobBack {
-    display: none;
 }
 
 .BackHome img {
@@ -242,11 +240,10 @@ h1 {
     font-size: 22px;
     font-weight: 700;
     color: var(--text1);
-
 }
 
 .post-form {
-    width: 370px;
+    max-width: 370px;
     min-height: 1000px;
     margin-left: 14%;
     padding: 1rem;
@@ -255,7 +252,6 @@ h1 {
     font-size: 12px;
     font-weight: 400;
 }
-
 
 .one {
     display: flex;
@@ -353,7 +349,7 @@ input[type="file"] {
 
 input[type="text"] {
     cursor: pointer;
-    width: 350px;
+    max-width: 350px;
     min-height: 40px;
     border: 1px;
     border-radius: 10px;
@@ -378,7 +374,7 @@ input[type="text"]:focus {
 }
 
 .two input[type="text"] {
-    width: 155px;
+    max-width: 155px;
 }
 
 .two .first {
@@ -424,31 +420,6 @@ button {
 }
 
 @media screen and (max-width: 750px) {
-    .BackHome {
-        display: none;
-    }
-
-    .MobBack {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        width: 330px;
-    }
-
-    .MobBack img {
-        width: 20px;
-        height: 20px;
-        padding-right: 50px;
-    }
-
-    .post-form {
-        margin: 0 auto;
-    }
-
-    .post-form h1 {
-        display: none;
-    }
-
     input[type="text"] {
         width: 300px;
     }
@@ -462,7 +433,7 @@ button {
     }
 
     .post-form {
-        width: 330px;
+        max-width: 330px;
     }
 }
 </style>
