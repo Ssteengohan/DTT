@@ -42,15 +42,13 @@ export default {
       const postStore = usePostStore();
       postStore.postHouses(this.newPost, this.image)
         .then(() => {
-          this.reloadPage();
+          this.$router.push('/');
         })
         .catch((error) => {
           console.error(error);
         });
     },
-    reloadPage() {
-      location.reload('/');
-    }
+
   },
 };
 </script>
@@ -58,15 +56,20 @@ export default {
 <template>
   <div class="bg">
     <div class="BackHome">
-        <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
-        <p class="PBack">Back to overview</p>
+      <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+      <p class="PBack">Back to overview</p>
+    </div>
+    <div class="MobBack">
+      <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+      <h1>Create new listing</h1>
     </div>
     <div class="post-form">
       <h1>Create new listing</h1>
       <form @submit.prevent="handleSubmit">
         <div class="one">
           <label for="streetName">Street name*</label>
-          <input type="text" v-model="newPost.streetName" placeholder="Enter the street name" required pattern="^[a-zA-Z\s]+$" title="Has to be a letter " />
+          <input type="text" v-model="newPost.streetName" placeholder="Enter the street name" required
+            pattern="^[a-zA-Z\s]+$" title="Has to be a letter " />
         </div>
         <div class="two">
           <div class="first">
@@ -89,11 +92,12 @@ export default {
           <input type="text" v-model="newPost.city" placeholder="e.g. Utrecht" required pattern="[a-zA-Z]+"
             title="Has to be a letter " />
         </div>
+        <label>Upload picture (PNG or JPG)</label>
         <div class="img">
           <img class="preview" v-if="url" :src="url" />
           <img src="@/assets/dtt/clear-white.png" class="clear" alt="clear" v-if="url" @click="handleClear" />
           <div class="upload" v-else>
-            <label>Upload picture (PNG or JPG)</label>
+
             <label id="box" for="image">
               <img class="plus" src="@/assets/dtt/plus.png" alt="plus">
             </label>
@@ -104,13 +108,13 @@ export default {
         <div class="one">
           <label for="price">Price*</label>
           <input type="text" v-model="newPost.price" placeholder="e.g. €150.000 " required pattern="\d+(\.\d{1,2})?"
-            title="Has to be a number with no spaces"/>
+            title="Has to be a number with no spaces" />
         </div>
         <div class="two">
           <div class="first" id="een">
             <label for="size">Size*</label>
             <input type="text" v-model="newPost.size" placeholder="e.g. 60m2" required pattern="\d+(\.\d{1,2})?"
-            title="Has to be a number with no spaces" />
+              title="Has to be a number with no spaces" />
           </div>
           <div class="second" id="twee">
             <label for="hasGarage">Has garage*</label>
@@ -124,19 +128,19 @@ export default {
         <div class="two">
           <div class="first">
             <label for="bedrooms">Bedrooms*</label>
-            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required 
-            title="Has to be a number with no spaces"/>
+            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required
+              title="Has to be a number with no spaces" />
           </div>
           <div class="sec">
             <label for="bathrooms">Bathrooms*</label>
             <input type="text" v-model="newPost.bathrooms" placeholder="Enter amount" required
-            title="Has to be a number with no spaces" />
+              title="Has to be a number with no spaces" />
           </div>
         </div>
         <div class="one">
           <label for="constructionYear">Construction year*</label>
           <input type="text" v-model="newPost.constructionYear" placeholder="e.g. 1980" required
-            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940"/>
+            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940" />
         </div>
         <div class="one">
           <label for="description">Description*</label>
@@ -147,61 +151,63 @@ export default {
     </div>
   </div>
 </template>
-  
 <style scoped>
-.bg {
-  background-image: url("@/assets/dtt/background.png");
-  height: 100%;
-  background-repeat: no-repeat;
-  background-size: cover;
+.BackHome {
+    margin-left: 15%;
+    margin-top: 2rem;
+    display: flex;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text1);
+    align-items: center;
 }
 
-.BackHome {
-  margin-left: 15%;
-  margin-top: 2rem;
-  display: flex;
-  font-family: var(--font-family);
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text1);
-  align-items: center;
+.MobBack {
+    display: none;
 }
 
 .BackHome img {
-  width: 20px;
-  height: 20px;
+    width: 20px;
+    height: 20px;
 }
 
+
+
 .PBack {
-  margin-left: 12px;
+    margin-left: 12px;
 }
 
 h1 {
-  font-family: var(--font-family);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text1);
+    font-family: var(--font-family);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text1);
+
 }
 
 .post-form {
-  max-width: 370px;
-  min-height: 1000px;
-  margin-left: 14%;
-  padding: 1rem;
-  border-radius: 1rem;
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 400;
+    width: 370px;
+    min-height: 1000px;
+    margin-left: 14%;
+    padding: 1rem;
+    border-radius: 1rem;
+    font-family: var(--font-family);
+    font-size: 12px;
+    font-weight: 400;
 }
+
 
 .one {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
 }
+
 label {
-    padding-bottom: 10px;
+  padding-bottom: 10px;
 }
+
 .two {
   display: flex;
   flex-direction: row;
@@ -234,7 +240,7 @@ label {
   display: flex;
   flex-direction: column;
   width: 100px;
-  height: 100px;
+  height: 90px;
   border-style: dashed;
   border-width: 3px;
   border-color: var(--tertiary2);
@@ -256,8 +262,8 @@ input[type="file"] {
 }
 
 .img .preview {
-  max-width: 100px;
-  min-height: 100px;
+  max-width: 110px;
+  min-height: 110px;
 }
 
 .clear {
@@ -339,20 +345,47 @@ button {
   color: var(--background2);
   background-color: var(--primary);
 }
+
 @media screen and (max-width: 750px) {
-  input[type="text"] {
-    width: 250px;
+  .BackHome {
+    display: none;
   }
-  .two input[type="text"] {
-    max-width: 107px;
+
+  .MobBack {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    width: 330px;
   }
-  #twee select {
-    min-width: 127px;
+
+  .MobBack img {
+    width: 20px;
+    height: 20px;
+    padding-right: 50px;
   }
+
   .post-form {
-    max-width: 270px;
+    margin: 0 auto;
+  }
+
+  .post-form h1 {
+    display: none;
+  }
+
+  input[type="text"] {
+    width: 300px;
+  }
+
+  .two input[type="text"] {
+    max-width: 130px;
+  }
+
+  #twee select {
+    min-width: 155px;
+  }
+
+  .post-form {
+    width: 330px;
   }
 }
-
-
 </style>

@@ -9,32 +9,42 @@ const showClearIcon = computed(() => searchText.value !== '')
 function clearInput() {
     searchText.value = ''
 }
-//Sorting the houses by price and size
-function sortPrice() {
-    const store = useHouseStore();
-    store.houses.sort((a, b) => b.price - a.price);
-}
-function sortSize() {
-    const store = useHouseStore();
-    store.houses.sort((a, b) => b.size - a.size);
-}
-
 
 export { searchText }
 
 export default {
     setup() {
+        const activeButton = ref('price')
+
+        //Sorting the houses by price and size
+        function sortPrice() {
+            const store = useHouseStore();
+            activeButton.value = 'price';
+            return store.SorthousesbyPrice();
+        }
+
+        function sortSize() {
+            const store = useHouseStore();
+            activeButton.value = 'size';
+            return store.SorthousesbySize();
+
+        }
+
+        const isSizeActive = computed(() => activeButton.value === 'size')
 
         return {
             sortSize,
             sortPrice,
             searchText,
             showClearIcon,
-            clearInput
+            clearInput,
+            activeButton,
+            isSizeActive,
         }
     }
 }
 </script>
+
 
         
 <template>
@@ -60,15 +70,54 @@ export default {
                         @input="showClearIcon = true" />
                 </div>
                 <div class="filter">
-                    <button class="price" @click="sortPrice()">Price</button>
-                    <button class="size" @click="sortSize()">Size</button>
+                    <button class="price" :class="{ active: activeButton === 'price', red: isSizeActive }"
+                        @click="sortPrice()">Price</button>
+                    <button class="size" :class="{ active: activeButton === 'size' }" @click="sortSize()">Size</button>
                 </div>
             </div>
         </div>
     </main>
 </template>
-  
+
 <style scoped>
+.filter {
+    display: flex;
+}
+
+.price.red {
+    background-color: var(--tertiary2);
+}
+
+.size.active {
+    background-color: var(--primary);
+}
+
+
+.size {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: var(--tertiary2);
+
+}
+
+.price {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: var(--primary);
+
+}
+
+.size,
+.price {
+    width: 130px;
+    height: 5.5vh;
+    color: var(--background);
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+}
+
 .mainpage {
     display: flex;
     flex-direction: column;
@@ -168,46 +217,17 @@ input[type="text"]:focus {
 }
 
 
-.filter {
-    display: flex;
-}
-
-.size {
-    background-color: var(--tertiary2);
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-
-}
-
-.price {
-    background-color: var(--primary);
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-
-}
-
-.size, .price {
-    width: 130px;
-    height: 5.5vh;
-    color: var(--background);
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 15px;
-    border: none;
-}
 
 @media (max-width: 750px) {
     .mainpage {
-        margin-left: 40px;
-        width: 100%;
         display: flex;
         flex-direction: column;
+        margin: 0 auto;
+        max-width: 90%;
     }
 
     .header {
-        margin-left: auto;
-        margin-right: auto;
-        display: table;
+        margin: 0 auto;
     }
 
     .create,
@@ -227,7 +247,6 @@ input[type="text"]:focus {
     .homepageButton {
         display: flex;
         flex-direction: column;
-        margin-left: 10px;
 
     }
 
@@ -236,20 +255,29 @@ input[type="text"]:focus {
     }
 
     input[type="text"] {
-        min-width: 110%;
+        width: 92.5%;
     }
 
     .clear {
-        margin-left: 100%;
+        margin-left: 94%;
         width: 18px;
+        top: 15%;
     }
 
-
+    .filter {
+        margin-bottom: 15px;
+    }
 
     .price,
     .size {
-        min-width: 61%;
+        width: 50%;
         max-height: 40px;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    input[type="text"] {
+        width: 88%;
     }
 }
 </style>  

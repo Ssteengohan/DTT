@@ -11,7 +11,7 @@ const requestOptions = {
 };
 
 export const useHouseStore = defineStore({
-  id: 'house',
+  id: 'houses',
   state: () => ({
     houses: [],
   }),
@@ -19,7 +19,8 @@ export const useHouseStore = defineStore({
     getHouses() {
       return fetch("https://api.intern.d-tt.nl/api/houses", requestOptions)
         .then(response => response.json())
-        .then(data => this.houses = data);
+        .then(data => this.houses = data)
+        .then(this.SorthousesbyPrice);
     },
     deleteHouse(id) {//delete houses
       const deleteOptions = {
@@ -34,6 +35,14 @@ export const useHouseStore = defineStore({
           return this.getHouses();
         });
     },
+    SorthousesbyPrice(){
+      this.houses.sortBy = 'price'; 
+      this.houses.sort((a, b) => b.price - a.price);
+  },
+  SorthousesbySize(){
+    this.houses.sortBy = 'size'; 
+    this.houses.sort((a, b) => b.size - a.size);
+  },
   }
 });
 

@@ -65,12 +65,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    max-width: 100%;
     min-height: 60px;
   }
-  .mobile-navbar {
-    width: 100%;
-  }
+
   nav {
     display: flex;
     justify-content: space-around;
