@@ -7,25 +7,25 @@ import DeletePopup from "@/components/house/DeletePopup.vue";
 
 export default {
   setup() {
+    // Get the store
     const store = useHouseStore();
-
+    // Get the houses
     const getHouses = () => {
       store.getHouses();
     };
 
-    const showDeletePopup = ref(false);
     const house = ref({}); // initialize house to an empty object
 
+    // Delete popup
+    const showDeletePopup = ref(false);
     const onCancelDelete = () => {
       showDeletePopup.value = false;
-      house.value = {}; // reset house to an empty object
+      house.value = {};
     };
 
+    // Delete the house
     const onConfirmDelete = () => {
-      // Delete the house
       store.deleteHouse(house.value.id);
-
-      // Hide the popup
       showDeletePopup.value = false;
       house.value = {}; // reset house to an empty object
       getHouses();
@@ -37,7 +37,14 @@ export default {
         const street = house.location.street.toLowerCase();
         const city = house.location.city.toLowerCase();
         const search = searchText.value.toLowerCase();
-        return street.includes(search) || city.includes(search);
+        const description = house.description.toLowerCase();
+        const price = house.price;
+        const size = house.size;
+        const bedrooms = house.rooms.bedrooms;
+        const bathrooms = house.rooms.bathrooms;
+        const construction = house.constructionYear;
+        return street.includes(search) || city.includes(search) || description.includes(search) || price.toString().includes(search)
+          || size.toString().includes(search) || bedrooms.toString().includes(search) || bathrooms.toString().includes(search) || construction.toString().includes(search);
       });
     });
 
@@ -46,6 +53,7 @@ export default {
       return filteredHouses.value.length === 0 && searchText.value !== "";
     });
 
+    // Method to sort houses by price
     const getPrice = () => {
       store.SorthousesbyPrice();
     };
@@ -56,7 +64,7 @@ export default {
       showDeletePopup.value = true;
     };
 
-    return {
+    return {// Return the variables and methods that you want to use in the template
       store,
       getHouses,
       showDeletePopup,
@@ -71,13 +79,13 @@ export default {
     };
   },
 
-  created() {
+  created() {// Call the getHouses method when the component is created
     this.getHouses();
-    this.getPrice();
   },
 
+  // Import the DeletePopup component here
   components: {
-    DeletePopup, // Import the DeletePopup component here
+    DeletePopup, 
   },
 };
 </script>
@@ -89,10 +97,7 @@ export default {
       results found
     </h1>
     <div class="MainPost" v-for="house in filteredHouses" :key="house.id">
-      <router-link
-        :to="{ name: 'detail', params: { id: house.id } }"
-        style="text-decoration: none; width: 100%"
-      >
+      <router-link :to="{ name: 'detail', params: { id: house.id } }" style="text-decoration: none; width: 100%">
         <div class="PostInfo">
           <div class="postImg">
             <img :src="house.image" alt="" class="houseImg" />
@@ -117,12 +122,7 @@ export default {
               <img src="@/assets/dtt/edit-red.png" alt="" class="edit" />
             </router-link>
             <div @click.prevent="onDeleteClick(house.id)">
-              <img
-                src="@/assets/dtt/delete.png"
-                alt=""
-                style="width: 20px; height: 20px"
-                class="delete"
-              />
+              <img src="@/assets/dtt/delete.png" alt="" style="width: 20px; height: 20px" class="delete" />
             </div>
           </div>
         </div>
@@ -133,11 +133,7 @@ export default {
       <p>No result found.</p>
       <p>Please try another keyword.</p>
     </div>
-    <DeletePopup
-      v-if="showDeletePopup"
-      @cancel="onCancelDelete"
-      @confirm="onConfirmDelete"
-    />
+    <DeletePopup v-if="showDeletePopup" @cancel="onCancelDelete" @confirm="onConfirmDelete" />
   </main>
 </template>
 
@@ -239,6 +235,7 @@ h1 {
   color: var(--secondary-text);
   font-weight: 400;
 }
+
 #img p {
   margin-top: 26px;
 }
@@ -314,6 +311,7 @@ h1 {
     width: 90%;
 
   }
+
   #img p {
     font-size: 12px;
   }
@@ -326,6 +324,7 @@ h1 {
     margin-left: 6%;
   }
 }
+
 @media screen and (max-width: 350px) {
   .postEdit {
     margin-left: -20px;

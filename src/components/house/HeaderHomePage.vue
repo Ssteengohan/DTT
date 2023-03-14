@@ -6,23 +6,25 @@ import { useHouseStore } from '@/stores/api.js';
 const searchText = ref('')
 const showClearIcon = computed(() => searchText.value !== '')
 
+//Clearing the search input
 function clearInput() {
     searchText.value = ''
 }
 
+//Exporting the search text so it can be used outside the HeaderHomePage.vue
 export { searchText }
 
 export default {
     setup() {
+        //Sorting the houses by price
         const activeButton = ref('price')
-
-        //Sorting the houses by price and size
         function sortPrice() {
             const store = useHouseStore();
             activeButton.value = 'price';
             return store.SorthousesbyPrice();
         }
 
+        //Sorting the houses by size
         function sortSize() {
             const store = useHouseStore();
             activeButton.value = 'size';
@@ -32,7 +34,7 @@ export default {
 
         const isSizeActive = computed(() => activeButton.value === 'size')
 
-        return {
+        return {//Returning the functions and variables so they can be used in the HeaderHomePage.vue
             sortSize,
             sortPrice,
             searchText,

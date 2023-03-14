@@ -1,7 +1,7 @@
 <script>
 import { useHouseStore } from "@/stores/api.js";
 import { useRoute } from "vue-router";
-import { computed, watch, ref } from "vue";
+import { computed, ref } from "vue";
 import DeletePopup from "@/components/house/DeletePopup.vue";
 
 export default {
@@ -10,54 +10,53 @@ export default {
   },
 
   setup() {
+    // Get the id from the route
     const router = useRoute();
     const id = computed(() => router.params.id);
-    const store = useHouseStore();
-    const showDeletePopup = ref(false);
-    const houseToDelete = ref({});
 
+    // Get the store
+    const store = useHouseStore();
+    // Get the houses
     const getHouses = () => {
       store.getHouses();
     };
 
-
+    // Delete house
+    const showDeletePopup = ref(false);
+    const houseToDelete = ref({});
     const deleteHouse = (id) => {
       store.deleteHouse(id);
       getHouses();
-      router.push('/');
     };
-
-
+    // Delete house popup
     const onCancelDelete = () => {
       showDeletePopup.value = false;
       houseToDelete.value = {};
     };
-
     const onConfirmDelete = () => {
       deleteHouse(houseToDelete.value.id);
       onCancelDelete();
     };
 
+    // Get the house
     const house = computed(() => {
       return store.houses.find((house) => house.id.toString() === id.value.toString());
     });
-
+    // Get the recommended houses
     const recommendedHouses = computed(() => {
       const currentIndex = store.houses.findIndex((h) => h.id === house.value.id);
       const nextHouses = store.houses.slice(currentIndex + 1).concat(store.houses.slice(0, currentIndex + 1));
       return nextHouses.slice(0, 3);
     });
 
-    watch(id, () => {
-      getHouses();
-    });
-
+    // Method to show delete popup
     const onDeleteClick = (houseId) => {
       houseToDelete.value = { id: houseId };
       showDeletePopup.value = true;
     };
 
-    return {
+
+    return {// return all the variables and methods that you want to use in the template
       showDeletePopup,
       houseToDelete,
       onCancelDelete,
@@ -71,11 +70,13 @@ export default {
     };
   },
 
-  created() {
+
+  created() {// When the component is created, get the houses
     this.getHouses();
   },
 };
 </script>
+
 
 
 <template>
@@ -112,7 +113,7 @@ export default {
           </div>
           <div class="DetailInfo">
             <div class="DetailEdit">
-              <h3 class="DetailStreet">{{ house.location.street }}</h3>
+              <h3 class="DetailStreet">{{ house.location.street }} {{ }}</h3>
               <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none"
                 v-if="house.madeByMe"><img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
               <div v-if="house.madeByMe">

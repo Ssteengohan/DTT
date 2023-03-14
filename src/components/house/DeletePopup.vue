@@ -1,11 +1,13 @@
 <script>
 export default {
+
   methods: {
-    onCancel() {
+    onCancel() {// When the user clicks outside the popup, close it
       this.$emit('cancel');
     },
-    onConfirm() {
+    onConfirm() {// When the user clicks the confirm button, close the popup and emit the confirm event
       this.$emit('confirm');
+      this.$router.push('/');
     }
   }
 }
@@ -66,6 +68,7 @@ p {
   font-weight: 400;
   font-size: 14px;
 }
+
 .second {
   margin-top: -11px;
 }
@@ -75,7 +78,7 @@ p {
   flex-direction: column;
   margin-top: 25px;
   width: 75%;
- margin: 0 auto;
+  margin: 0 auto;
 }
 
 .yes {
@@ -90,6 +93,7 @@ p {
   padding: 10px 20px;
   margin-bottom: 15px;
 }
+
 .no {
   background-color: var(--secondary);
   color: white;
@@ -105,21 +109,23 @@ p {
   .popup-content {
     width: 80%;
   }
+
   .yes,
   .no {
     width: 100%;
     white-space: nowrap;
   }
+
   .popup-content {
     height: 280px;
   }
+
   h1 {
     font-size: 18px;
   }
 
- p {
+  p {
     font-size: 12px;
- }
+  }
 
-}
-</style>
+}</style>
