@@ -261,7 +261,7 @@ input[type="text"]:focus {
     }
 
     .clear {
-        margin-left: 94%;
+        margin-left: 93%;
         width: 18px;
         top: 15%;
     }

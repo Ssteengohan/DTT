@@ -61,6 +61,7 @@ export default {
       this.url = URL.createObjectURL(this.image);
     },
 
+
     handleSubmit() {//handle submit
       const requiredFields = [
         "streetName",
@@ -75,7 +76,9 @@ export default {
         "constructionYear",
         "hasGarage",
       ];
-      let hasError = false;//check if there is an error
+      let hasError = false;
+
+      // Check if all required fields are filled
       for (const field of requiredFields) {
         if (!this.newPost[field]) {
           hasError = true;
@@ -87,21 +90,31 @@ export default {
         }
       }
 
-      if (hasError) {//if there is an error show error
+      // Check if an image is selected
+      if (!this.image) {
+        alert("Please select an image");
+        return;
+      }
+
+      // If there are errors, show the error message and return
+      if (hasError) {
         this.showError = true;
         return;
       }
-      //if there is no error post the house
+
+      // If there are no errors, submit the form
       const postStore = usePostStore();
-      postStore
-        .postHouses(this.newPost, this.image)
-        .then(({ id }) => {//go to detail page
+      postStore.postHouses(this.newPost, this.image)
+        .then(({ id }) => {
+          // Navigate to the detail page
           this.$router.push({ name: "detail", params: { id: id } });
         })
         .catch((error) => {
           console.error(error);
         });
-    },
+    }
+
+
   },
 };
 </script>
@@ -279,7 +292,7 @@ h1 {
 
 .post-form {
   width: 370px;
-  min-height: 1050px;
+  height: 1060px;
   margin-left: 14%;
   padding: 1rem;
   border-radius: 1rem;
@@ -445,7 +458,7 @@ button {
     display: flex;
     align-items: center;
     margin: 0 auto;
-    width: 330px;
+    width: 320px;
   }
 
   .MobBack img {
