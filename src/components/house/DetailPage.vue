@@ -84,17 +84,19 @@ export default {
     <div class="MainDetail" v-if="house">
       <div class="backgroundimg">
         <img :src="house.image" alt="house-img" class="BackgroundImg" />
-        <div class="Goback-mob">
-          <router-link style="text-decoration: none; color: inherit" to="/">
-            <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back" />
-          </router-link>
-        </div>
         <div class="mobilEdit" v-if="house.madeByMe">
-          <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none">
-            <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" /></router-link>
-          <div>
-            <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white"
-              @click.prevent="onDeleteClick(house.id)" />
+          <div class="Goback-mob">
+            <router-link style="text-decoration: none; color: inherit" to="/">
+              <img src="@/assets/dtt/back-white.png" alt="back" id="back-white" class="back" />
+            </router-link>
+          </div>
+          <div class="EditAndDelete">
+            <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none">
+              <img src="@/assets/dtt/edit-white.png" alt="" class="edit-white" /></router-link>
+            <div>
+              <img src="@/assets/dtt/delete-white.png" alt="" class="delete-white"
+                @click.prevent="onDeleteClick(house.id)" />
+            </div>
           </div>
         </div>
       </div>
@@ -185,7 +187,7 @@ export default {
   margin-left: 15%;
   margin-top: 40px;
   max-width: 70%;
-  min-height: 650px;
+  height: 800px;
 }
 
 .back {
@@ -411,7 +413,7 @@ a.router-link-exact-active {
   color: var(--primary-text);
 }
 
-@media screen and (max-width: 650px) {
+@media screen and (max-width: 750px) {
   .MainDetail {
     margin-top: 0;
     margin-left: 0%;
@@ -449,6 +451,7 @@ a.router-link-exact-active {
   .Goback-mob {
     align-items: baseline;
     position: absolute;
+    top: 18px;
   }
 
   .Goback {
@@ -466,11 +469,9 @@ a.router-link-exact-active {
     display: block;
     max-width: 23px;
     min-height: 23px;
-    margin-left: 20px;
-    margin-top: -280px;
   }
 
-  .mobilEdit {
+  .EditAndDelete {
     display: flex;
     right: 8px;
     top: 18px;
@@ -491,6 +492,12 @@ a.router-link-exact-active {
 
   .RecommendedContainer {
     width: 100%;
+  }
+
+  .RecommendedContainer:last-child {
+    border-bottom-width: 60px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--background);
   }
 
   .DetailStreet {

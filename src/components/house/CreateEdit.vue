@@ -182,7 +182,7 @@ export default {
         },
 
         handleSubmit() {// Submit the edited post
-            if (!this.allFieldsFilled)  {
+            if (!this.allFieldsFilled) {
                 this.showError = true;
             } else {
                 this.showError = false;
@@ -309,6 +309,9 @@ export default {
                         <input type="file" id="image" accept="image/png, image/jpeg" @change="handleImageChange"
                             title="Only PNG or JPEG" />
                     </div>
+                    <div v-if="!house.image && !url">
+                        <p>Please upload a picture</p>
+                    </div>
                 </div>
                 <div class="one">
                     <label for="price">Price*</label>
@@ -369,7 +372,7 @@ export default {
                 <button type="submit" :class="{
                     notActive: !allFieldsFilled,
                     'red-button': allFieldsFilled,
-                }"  >
+                }">
                     POST
                 </button>
             </form>
@@ -429,7 +432,7 @@ h1 {
 
 .post-form {
     width: 370px;
-    min-height: 1000px;
+    height: 1060px;
     margin-left: 14%;
     padding: 1rem;
     border-radius: 1rem;
@@ -616,7 +619,7 @@ button {
         display: flex;
         align-items: center;
         margin: 0 auto;
-        width: 330px;
+        width: 320px;
     }
 
     .MobBack img {

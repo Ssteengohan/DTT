@@ -76,6 +76,7 @@ h1:nth-child(5) {
   .Main {
     margin: 0 auto;
     width: 90%;
+    height: 750px;
   }
 
   .About {
@@ -96,7 +97,7 @@ h1:nth-child(5) {
   }
 
   img {
-    width: 15%;
+    width: 90px;
     height: 50px;
   }
 
