@@ -140,7 +140,7 @@ export default {
         };
     },
 
-    computed: {  // Check if all fields are filled
+    computed: {
         allFieldsFilled() {
             const fields = [
                 this.EditPost.streetName,
@@ -155,7 +155,10 @@ export default {
                 this.EditPost.description,
                 this.EditPost.hasGarage,
             ];
-            return fields.every((field) => field);
+
+            return fields.every((field) => {
+                return field !== undefined && field !== null && field !== '';
+            });
         },
     },
 
@@ -179,7 +182,7 @@ export default {
         },
 
         handleSubmit() {// Submit the edited post
-            if (!this.EditPost.streetName) {
+            if (!this.allFieldsFilled)  {
                 this.showError = true;
             } else {
                 this.showError = false;
@@ -271,7 +274,8 @@ export default {
                         <label for="houseNumber">House number*</label>
                         <input type="number" v-model="EditPost.houseNumber" placeholder="Enter the house number"
                             oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                            title="Has to be a number and leave no spaces" :class="{ error: !EditPost.houseNumber }" />
+                            title="Has to be a number and leave no spaces"
+                            :class="{ error: !EditPost.houseNumber && showError }" />
                     </div>
                     <div class="second">
                         <label for="numberAddition">Number addition*</label>
@@ -282,12 +286,12 @@ export default {
                     <label for="zip">Postal code*</label>
                     <input type="text" placeholder="e.g. 1000 AA" v-model="EditPost.zip" pattern="[0-9]{4}\s?[a-zA-Z]{2}"
                         title="Has to be atleast 4 digits a space and 2 letters and leave no spaces "
-                        :class="{ error: !EditPost.zip }" />
+                        :class="{ error: !EditPost.zip && showError }" />
                 </div>
                 <div class="one">
                     <label for="city">City*</label>
                     <input type="text" placeholder="e.g. Utrecht" v-model="EditPost.city" pattern="[a-zA-Z]+"
-                        title="Has to be a letter and leave no spaces" :class="{ error: !EditPost.city }" />
+                        title="Has to be a letter and leave no spaces" :class="{ error: !EditPost.city && showError }" />
                 </div>
                 <div class="image">
                     <label>Upload picture (PNG or JPG)</label>
@@ -310,18 +314,19 @@ export default {
                     <label for="price">Price*</label>
                     <input type="number" placeholder="e.g. €150.000 " v-model="EditPost.price"
                         oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                        title="Has to be a number and leave no spaces" :class="{ error: !EditPost.price }" />
+                        title="Has to be a number and leave no spaces" :class="{ error: !EditPost.price && showError }" />
                 </div>
                 <div class="two">
                     <div class="first" id="een">
                         <label for="size">Size*</label>
                         <input type="number" placeholder="e.g. 60m2" v-model="EditPost.size"
                             oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                            title="Has to be a number and leave no spaces" :class="{ error: !EditPost.size }" />
+                            title="Has to be a number and leave no spaces"
+                            :class="{ error: !EditPost.size && showError }" />
                     </div>
                     <div class="second" id="twee">
                         <label for="hasGarage">Has garage*</label>
-                        <select v-model="EditPost.hasGarage" :class="{ error: !EditPost.hasGarage }">
+                        <select v-model="EditPost.hasGarage" :class="{ error: !EditPost.hasGarage && showError }">
                             <option value="" disabled selected>Select</option>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
@@ -333,13 +338,15 @@ export default {
                         <label for="bedrooms">Bedrooms*</label>
                         <input type="number" placeholder="Enter amount" v-model="EditPost.bedrooms"
                             oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                            title="Has to be a number and leave no spaces" :class="{ error: !EditPost.bedrooms }" />
+                            title="Has to be a number and leave no spaces"
+                            :class="{ error: !EditPost.bedrooms && showError }" />
                     </div>
                     <div class="sec">
                         <label for="bathrooms">Bathrooms*</label>
                         <input type="number" placeholder="Enter amount" v-model="EditPost.bathrooms"
                             oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                            title="Has to be a number and leave no spaces" :class="{ error: !EditPost.bathrooms }" />
+                            title="Has to be a number and leave no spaces"
+                            :class="{ error: !EditPost.bathrooms && showError }" />
                     </div>
                 </div>
                 <div class="one">
@@ -347,12 +354,13 @@ export default {
                     <input type="number" placeholder="e.g. 1980" v-model="EditPost.constructionYear"
                         pattern="(19[4-9]\d|20[0-2]\d)"
                         oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                        title="Has to be 4 digits and above 1940" :class="{ error: !EditPost.constructionYear }" />
+                        title="Has to be 4 digits and above 1940"
+                        :class="{ error: !EditPost.constructionYear && showError }" />
                 </div>
                 <div class="one">
                     <label for="description">Description*</label>
                     <textarea placeholder="Write a description" v-model="EditPost.description"
-                        :class="{ error: !EditPost.description }"></textarea>
+                        :class="{ error: !EditPost.description && showError }"></textarea>
                 </div>
 
                 <div v-if="showError" class="error-message">
@@ -361,7 +369,7 @@ export default {
                 <button type="submit" :class="{
                     notActive: !allFieldsFilled,
                     'red-button': allFieldsFilled,
-                }">
+                }"  >
                     POST
                 </button>
             </form>
@@ -554,7 +562,7 @@ input[type="number"]:focus {
 
 .two input[type="text"],
 .two input[type="number"] {
-    max-width: 155px;
+    width: 155px;
 }
 
 .two .first {
@@ -632,6 +640,13 @@ button {
     .two input[type="text"] {
         max-width: 130px;
     }
+
+    .two input[type="text"],
+    .two input[type="number"] {
+        width: 130px;
+    }
+
+
 
     button {
         width: 100%;
