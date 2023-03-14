@@ -1,54 +1,107 @@
 <script>
-import { usePostStore } from '@/stores/api.js';
+import { usePostStore } from "@/stores/api.js";
 
 export default {
   data() {
-    return {
+    return {//set all fields to empty
       newPost: {
-        price: '',
-        bedrooms: '',
-        bathrooms: '',
-        size: '',
-        streetName: '',
-        houseNumber: '',
-        numberAddition: '',
-        zip: '',
-        city: '',
-        constructionYear: '',
-        hasGarage: '',
-        description: '',
+        price: "",
+        bedrooms: "",
+        bathrooms: "",
+        size: "",
+        streetName: "",
+        houseNumber: "",
+        numberAddition: "",
+        zip: "",
+        city: "",
+        constructionYear: "",
+        hasGarage: "",
+        description: "",
       },
       image: null,
       url: null,
+      showError: false,
     };
   },
+  computed: {
+    allFieldsFilled() {
+      // Check if all fields are filled
+      const requiredFields = [
+        "streetName",
+        "description",
+        "houseNumber",
+        "zip",
+        "city",
+        "price",
+        "bedrooms",
+        "bathrooms",
+        "size",
+        "constructionYear",
+        "hasGarage",
+      ];
+      return requiredFields.every((field) => !!this.newPost[field]);
+    },
+  },
+
   methods: {
-    goBack() {//Go back to previous page
+    goBack() {//go back to previous page
       this.$router.go(-1);
     },
-    handleClear() {//Clear the file input
+
+    handleClear() {//clear all fields
       this.image = null;
       this.url = null;
       const input = this.$refs.imageInput;
-      input.type = 'text';
-      input.type = 'file';
+      input.type = "text";
+      input.type = "file";
     },
-    handleImageChange(event) {//Show the image preview
+
+    handleImageChange(event) {//handle image change
       this.image = event.target.files[0];
       this.url = URL.createObjectURL(this.image);
-
     },
-    handleSubmit() {//Submit the form
+
+    handleSubmit() {//handle submit
+      const requiredFields = [
+        "streetName",
+        "description",
+        "houseNumber",
+        "zip",
+        "city",
+        "price",
+        "bedrooms",
+        "bathrooms",
+        "size",
+        "constructionYear",
+        "hasGarage",
+      ];
+      let hasError = false;//check if there is an error
+      for (const field of requiredFields) {
+        if (!this.newPost[field]) {
+          hasError = true;
+          const input = this.$refs[field];
+          input.classList.add("error");
+        } else {
+          const input = this.$refs[field];
+          input.classList.remove("error");
+        }
+      }
+
+      if (hasError) {//if there is an error show error
+        this.showError = true;
+        return;
+      }
+      //if there is no error post the house
       const postStore = usePostStore();
-      postStore.postHouses(this.newPost, this.image)
-        .then(() => {
-          this.$router.push('/');
+      postStore
+        .postHouses(this.newPost, this.image)
+        .then(({ id }) => {//go to detail page
+          this.$router.push({ name: "detail", params: { id: id } });
         })
         .catch((error) => {
           console.error(error);
         });
     },
-
   },
 };
 </script>
@@ -56,26 +109,27 @@ export default {
 <template>
   <div class="bg">
     <div class="BackHome">
-      <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+      <img @click="goBack" src="@/assets/dtt/back.png" alt="back" />
       <p class="PBack">Back to overview</p>
     </div>
     <div class="MobBack">
-      <img @click="goBack" src="@/assets/dtt/back.png" alt="back">
+      <img @click="goBack" src="@/assets/dtt/back.png" alt="back" />
       <h1>Create new listing</h1>
     </div>
     <div class="post-form">
       <h1>Create new listing</h1>
-      <form @submit.prevent="handleSubmit">
+      <form @submit.prevent="handleSubmit" ref="form">
         <div class="one">
           <label for="streetName">Street name*</label>
-          <input type="text" v-model="newPost.streetName" placeholder="Enter the street name" required
-            pattern="^[a-zA-Z\s]+$" title="Has to be a letter " />
+          <input type="text" v-model="newPost.streetName" placeholder="Enter the street name"
+            title="Has to be a number with no spaces" class="required-field" ref="streetName" pattern="^[a-zA-Z\s]+$" />
         </div>
         <div class="two">
           <div class="first">
             <label for="houseNumber">House number*</label>
-            <input type="text" v-model="newPost.houseNumber" placeholder="Enter house number" required pattern="[0-9]+"
-              title="Has to be a number" />
+            <input type="number" v-model="newPost.houseNumber" placeholder="Enter house number"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+              title="Has to be a number" class="required-field" ref="houseNumber" />
           </div>
           <div class="second">
             <label for="numberAddition">Number addition*</label>
@@ -84,41 +138,42 @@ export default {
         </div>
         <div class="one">
           <label for="zip">Postal code*</label>
-          <input type="text" v-model="newPost.zip" placeholder="e.g. 1000 AA" required pattern="[0-9]{4}\s?[a-zA-Z]{2}"
-            title="Has to be atleast 4 digits a space and 2 letters" />
+          <input type="text" v-model="newPost.zip" placeholder="e.g. 1000 AA" pattern="[0-9]{4}\s?[a-zA-Z]{2}"
+            title="Has to be atleast 4 digits a space and 2 letters" class="required-field" ref="zip" />
         </div>
         <div class="one">
           <label for="city">City*</label>
-          <input type="text" v-model="newPost.city" placeholder="e.g. Utrecht" required pattern="[a-zA-Z]+"
-            title="Has to be a letter " />
+          <input type="text" v-model="newPost.city" placeholder="e.g. Utrecht" pattern="[a-zA-Z]+"
+            title="Has to be a letter " class="required-field" ref="city" />
         </div>
         <label>Upload picture (PNG or JPG)</label>
         <div class="img">
           <img class="preview" v-if="url" :src="url" />
           <img src="@/assets/dtt/clear-white.png" class="clear" alt="clear" v-if="url" @click="handleClear" />
           <div class="upload" v-else>
-
             <label id="box" for="image">
-              <img class="plus" src="@/assets/dtt/plus.png" alt="plus">
+              <img class="plus" src="@/assets/dtt/plus.png" alt="plus" />
             </label>
           </div>
-          <input type="file" id="image" accept="image/png, image/jpeg" @change="handleImageChange" required
+          <input type="file" id="image" accept="image/png, image/jpeg" @change="handleImageChange"
             title="Only PNG or JPEG" />
         </div>
         <div class="one">
           <label for="price">Price*</label>
-          <input type="text" v-model="newPost.price" placeholder="e.g. €150.000 " required pattern="\d+(\.\d{1,2})?"
-            title="Has to be a number with no spaces" />
+          <input type="number" v-model="newPost.price" placeholder="e.g. €150.000 "
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+            title="Has to be a number with no spaces" class="required-field" ref="price" />
         </div>
         <div class="two">
           <div class="first" id="een">
             <label for="size">Size*</label>
-            <input type="text" v-model="newPost.size" placeholder="e.g. 60m2" required pattern="\d+(\.\d{1,2})?"
-              title="Has to be a number with no spaces" />
+            <input type="number" v-model="newPost.size" placeholder="e.g. 60m2"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+              title="Has to be a number with no spaces" class="required-field" ref="size" />
           </div>
           <div class="second" id="twee">
             <label for="hasGarage">Has garage*</label>
-            <select v-model="newPost.hasGarage" required>
+            <select v-model="newPost.hasGarage" class="required-field" ref="hasGarage">
               <option value="" disabled selected>Select</option>
               <option value="true">Yes</option>
               <option value="false">No</option>
@@ -128,75 +183,110 @@ export default {
         <div class="two">
           <div class="first">
             <label for="bedrooms">Bedrooms*</label>
-            <input type="text" v-model="newPost.bedrooms" placeholder="Enter amount" required
-              title="Has to be a number with no spaces" />
+            <input type="number" v-model="newPost.bedrooms" placeholder="Enter amount"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+              title="Has to be a number with no spaces" class="required-field" ref="bedrooms" />
           </div>
           <div class="sec">
             <label for="bathrooms">Bathrooms*</label>
-            <input type="text" v-model="newPost.bathrooms" placeholder="Enter amount" required
-              title="Has to be a number with no spaces" />
+            <input type="number" v-model="newPost.bathrooms" placeholder="Enter amount"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+              title="Has to be a number with no spaces" class="required-field" ref="bathrooms" />
           </div>
         </div>
         <div class="one">
           <label for="constructionYear">Construction year*</label>
-          <input type="text" v-model="newPost.constructionYear" placeholder="e.g. 1980" required
-            pattern="(19[4-9]\d|20[0-2]\d)" title="Has to be 4 digits and above 1940" />
+          <input type="number" v-model="newPost.constructionYear" placeholder="e.g. 1980" pattern="(19[4-9]\d|20[0-2]\d)"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+            title="Has to be 4 digits and above 1940" class="required-field" ref="constructionYear" />
         </div>
         <div class="one">
           <label for="description">Description*</label>
-          <textarea v-model="newPost.description" placeholder="Write a description" required></textarea>
+          <textarea v-model="newPost.description" placeholder="Write a description" ref="description"
+            class="required-field"></textarea>
         </div>
-        <button type="submit">POST</button>
+        <div v-if="showError" class="error-message">
+          <label>Required field missing</label>
+        </div>
+        <button type="submit" :class="{
+          notActive: !allFieldsFilled,
+          'red-button': allFieldsFilled,
+        }">
+          POST
+        </button>
       </form>
     </div>
   </div>
 </template>
 <style scoped>
+.required-field.error {
+  outline: 2px solid var(--primary);
+}
+
+input.required-field.error::placeholder,
+textarea.required-field.error::placeholder {
+  color: var(--primary);
+}
+
+.notActive {
+  background-color: #da8e83;
+}
+
+.error-message {
+  color: var(--primary);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.bg {
+  background-image: url("@/assets/dtt/background.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
 .BackHome {
-    margin-left: 15%;
-    margin-top: 2rem;
-    display: flex;
-    font-family: var(--font-family);
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--text1);
-    align-items: center;
+  margin-left: 15%;
+  margin-top: 2rem;
+  display: flex;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text1);
+  align-items: center;
 }
 
 .MobBack {
-    display: none;
+  display: none;
 }
 
 .BackHome img {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
 }
 
-
-
 .PBack {
-    margin-left: 12px;
+  margin-left: 12px;
 }
 
 h1 {
-    font-family: var(--font-family);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text1);
-
+  font-family: var(--font-family);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text1);
 }
 
 .post-form {
-    width: 370px;
-    min-height: 1000px;
-    margin-left: 14%;
-    padding: 1rem;
-    border-radius: 1rem;
-    font-family: var(--font-family);
-    font-size: 12px;
-    font-weight: 400;
+  width: 370px;
+  min-height: 1050px;
+  margin-left: 14%;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 400;
 }
-
 
 .one {
   display: flex;
@@ -274,7 +364,8 @@ input[type="file"] {
   margin-top: -5px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   cursor: pointer;
   max-width: 350px;
   min-height: 40px;
@@ -288,20 +379,23 @@ input[type="text"] {
   padding-left: 20px;
 }
 
-input[type="text"]::placeholder {
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  outline: none;
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
   color: var(--tertiary2);
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 12px;
 }
 
-
-input[type="text"]:focus {
-  outline: none;
-}
-
-.two input[type="text"] {
-  max-width: 155px;
+.two input[type="text"],
+.two input[type="number"] {
+  width: 155px;
 }
 
 .two .first {
@@ -319,10 +413,6 @@ textarea {
   background-color: var(--background2);
   padding: 20px;
   resize: none;
-}
-
-textarea:focus {
-  outline: none;
 }
 
 textarea::placeholder {
@@ -376,12 +466,17 @@ button {
     width: 300px;
   }
 
-  .two input[type="text"] {
-    max-width: 130px;
+  .two input[type="text"],
+  .two input[type="number"] {
+    width: 130px;
   }
 
   #twee select {
     min-width: 155px;
+  }
+
+  button {
+    width: 100%;
   }
 
   .post-form {
