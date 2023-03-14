@@ -185,7 +185,7 @@ export default {
   margin-left: 15%;
   margin-top: 40px;
   max-width: 70%;
-  min-height: 850px;
+  min-height: 650px;
 }
 
 .back {

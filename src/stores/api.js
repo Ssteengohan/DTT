@@ -113,6 +113,7 @@ export const usePostStore = defineStore({
           `https://api.intern.d-tt.nl/api/houses/${id}/upload`,
           imageRequestOptions
         );
+        
         if (!imageResponse.ok) {
           throw new Error(imageResponse.statusText);
         }
