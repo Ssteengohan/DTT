@@ -11,21 +11,20 @@ const requestOptions = {
   redirect: "follow",
 };
 
-export const useHouseStore = defineStore({
+export const useHouseStore = defineStore({//get houses
   id: "houses",
   state: () => ({
     houses: [],
   }),
   actions: {
-    //get all houses
     getHouses() {
       return fetch("https://api.intern.d-tt.nl/api/houses", requestOptions)
         .then((response) => response.json())
         .then((data) => (this.houses = data))
         .then(this.SorthousesbyPrice);
     },
+    //delete houses
     deleteHouse(id) {
-      //delete houses
       const deleteOptions = {
         method: "DELETE",
         headers: myHeaders,
@@ -38,19 +37,20 @@ export const useHouseStore = defineStore({
           return this.getHouses();
         });
     },
+    //sort houses by price
     SorthousesbyPrice() {
-      //sort houses by price
       this.houses.sortBy = "price";
       this.houses.sort((a, b) => b.price - a.price);
     },
+    //sort houses by size
     SorthousesbySize() {
-      //sort houses by size
       this.houses.sortBy = "size";
       this.houses.sort((a, b) => b.size - a.size);
     },
   },
 });
 
+//Post function for houses
 export const usePostStore = defineStore({
   id: "post",
   state: () => ({

@@ -78,7 +78,7 @@ export default {
         // Get the garage
         const garage = computed(() => {
             const garage = house.value?.hasGarage;
-            return garage ? garage : null;
+            return garage !== undefined && garage !== null ? garage.toString() : "";
         });
 
         // Get the bedrooms
@@ -105,7 +105,8 @@ export default {
             return description ? description : null;
         });
 
-        return {// The data of the post that is being edited
+        return {
+            // The data of the post that is being edited
             EditPost: {
                 price: "",
                 bedrooms: "",
@@ -141,7 +142,7 @@ export default {
     },
 
     computed: {
-        allFieldsFilled() {
+        allFieldsFilled() {// Check if all fields are filled
             const fields = [
                 this.EditPost.streetName,
                 this.EditPost.houseNumber,
@@ -157,17 +158,19 @@ export default {
             ];
 
             return fields.every((field) => {
-                return field !== undefined && field !== null && field !== '';
+                return field !== undefined && field !== null && field !== "";
             });
         },
     },
 
     methods: {
-        goBack() { // Go back to the previous page
+        goBack() {
+            // Go back to the previous page
             this.$router.go(-1);
         },
 
-        handleClear() { // Clear the file input
+        handleClear() {
+            // Clear the file input
             this.image = null;
             this.url = null;
             this.house.image = null;
@@ -176,12 +179,14 @@ export default {
             input.type = "file";
         },
 
-        handleImageChange(event) {// Show the image preview
+        handleImageChange(event) {
+            // Show the image preview
             this.image = event.target.files[0];
             this.url = URL.createObjectURL(this.image);
         },
 
-        handleSubmit() {// Submit the edited post
+        handleSubmit() {
+            // Submit the edited post
             if (!this.allFieldsFilled) {
                 this.showError = true;
             } else {
@@ -190,15 +195,23 @@ export default {
                 const payload = { EditHouse: this.EditPost };
                 EditPostStore()
                     .EditHouses(id, payload)
-                    .then(() => { // If no image is selected, don't update the image
+                    .then(() => {
+                        // If no image is selected, don't update the image
                         if (!this.image) {
-                            this.$router.push({ name: "detail", params: { id: id } });
+                            // Reload the page after the navigation
+                            location.reload();
+                            // Redirect to the detail page
+                            window.location.href = `/detail/${id}`;
                             return;
-                        } else {// If an image is selected, update the image
+                        } else {
+                            // If an image is selected, update the image
                             useImageStore()
                                 .updateImage(id, this.image)
                                 .then(() => {
-                                    this.$router.push({ name: "detail", params: { id: id } });
+                                    // Reload the page after the navigation
+                                    location.reload();
+                                    // Redirect to the detail page
+                                    window.location.href = `/detail/${id}`;
                                 })
                                 .catch((error) => {
                                     console.error(error);
@@ -210,46 +223,38 @@ export default {
                     });
             }
         },
-    },
-    mounted() {// Get the data of the post that is being edited
-        this.getHouses();
-        this.EditPost.streetName = this.street;
-        this.EditPost.numberAddition = isNaN(this.additionalInfo)
-            ? this.additionalInfo
-            : "";
-        this.EditPost.houseNumber = this.numbers;
-        this.EditPost.houseNumber = this.numbers;
-        this.EditPost.zip = this.zip;
-        this.EditPost.city = this.city;
-        this.EditPost.price = this.price;
-        this.EditPost.size = this.size;
-        this.EditPost.hasGarage = this.garage;
-        this.EditPost.bedrooms = this.bedrooms;
-        this.EditPost.bathrooms = this.bathrooms;
-        this.EditPost.constructionYear = this.constructionYear;
-        this.EditPost.description = this.description;
+
+        // Update the data of the post that is being edited
+        updateEditPostData() {
+            this.EditPost = {
+                streetName: this.street,
+                numberAddition: isNaN(this.additionalInfo) ? this.additionalInfo : "",
+                houseNumber: this.numbers,
+                zip: this.zip,
+                city: this.city,
+                price: this.price,
+                size: this.size,
+                hasGarage: this.garage,
+                bedrooms: this.bedrooms,
+                bathrooms: this.bathrooms,
+                constructionYear: this.constructionYear,
+                description: this.description,
+            };
+        },
     },
 
+    created() {
+        this.getHouses();
+        this.updateEditPostData();
+    },
     watch: {
-        house() {// Update the data of the post that is being edited
-            this.EditPost.streetName = this.street;
-            this.EditPost.numberAddition = isNaN(this.additionalInfo)
-                ? this.additionalInfo
-                : "";
-            this.EditPost.houseNumber = this.numbers;
-            this.EditPost.zip = this.zip;
-            this.EditPost.city = this.city;
-            this.EditPost.price = this.price;
-            this.EditPost.size = this.size;
-            this.EditPost.hasGarage = this.garage;
-            this.EditPost.bedrooms = this.bedrooms;
-            this.EditPost.bathrooms = this.bathrooms;
-            this.EditPost.constructionYear = this.constructionYear;
-            this.EditPost.description = this.description;
+        house() {
+            this.updateEditPostData();
         },
     },
 };
 </script>
+
 <template>
     <div class="bg" v-if="house">
         <div class="BackHome">
@@ -648,8 +653,6 @@ button {
     .two input[type="number"] {
         width: 130px;
     }
-
-
 
     button {
         width: 100%;
