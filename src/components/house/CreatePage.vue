@@ -62,8 +62,8 @@ export default {
     },
 
 
-    handleSubmit() {//handle submit
-      const requiredFields = [
+    handleSubmit() {
+      const requiredFields = [//set all required fields
         "streetName",
         "description",
         "houseNumber",
@@ -106,15 +106,15 @@ export default {
       const postStore = usePostStore();
       postStore.postHouses(this.newPost, this.image)
         .then(({ id }) => {
-          // Navigate to the detail page
-          this.$router.push({ name: "detail", params: { id: id } });
+          // Reload the page after the navigation
+          location.reload();
+          // Redirect to the detail page
+          window.location.href = `/detail/${id}`;
         })
         .catch((error) => {
           console.error(error);
         });
     }
-
-
   },
 };
 </script>
