@@ -242,7 +242,6 @@ export default {
             };
         },
     },
-
     created() {
         this.getHouses();
         this.updateEditPostData();
@@ -254,7 +253,6 @@ export default {
     },
 };
 </script>
-
 <template>
     <div class="bg" v-if="house">
         <div class="BackHome">

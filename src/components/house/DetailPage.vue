@@ -115,7 +115,7 @@ export default {
           </div>
           <div class="DetailInfo">
             <div class="DetailEdit">
-              <h3 class="DetailStreet">{{ house.location.street }} {{ }}</h3>
+              <h3 class="DetailStreet">{{ house.location.street }}  {{ house.location.houseNumber}}</h3>
               <router-link :to="{ name: 'edit', params: { id: house.id } }" style="text-decoration: none"
                 v-if="house.madeByMe"><img src="@/assets/dtt/edit-red.png" alt="" class="edit-detail" /></router-link>
               <div v-if="house.madeByMe">

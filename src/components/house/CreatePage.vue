@@ -3,7 +3,7 @@ import { usePostStore } from "@/stores/api.js";
 
 export default {
   data() {
-    return {//set all fields to empty
+    return {// Initialize the new post object
       newPost: {
         price: "",
         bedrooms: "",
@@ -24,8 +24,7 @@ export default {
     };
   },
   computed: {
-    allFieldsFilled() {
-      // Check if all fields are filled
+    allFieldsFilled() {// Check if all required fields are filled
       const requiredFields = [
         "streetName",
         "description",
@@ -42,28 +41,31 @@ export default {
       return requiredFields.every((field) => !!this.newPost[field]);
     },
   },
-
   methods: {
-    goBack() {//go back to previous page
+    goBack() {// Go back to the previous page
       this.$router.go(-1);
     },
-
-    handleClear() {//clear all fields
+    handleClear() {// Clear the image input
       this.image = null;
       this.url = null;
       const input = this.$refs.imageInput;
       input.type = "text";
       input.type = "file";
     },
-
-    handleImageChange(event) {//handle image change
+    handleImageChange(event) {// Handle the image input change
       this.image = event.target.files[0];
       this.url = URL.createObjectURL(this.image);
     },
-
-
+    sanitizeInput(input) {
+      // Implement input sanitization logic here (e.g., remove special characters, escape quotes, etc.)
+      return input;
+    },
+    validateInput(input) {
+      // Implement input validation logic here (e.g., check for allowed characters, length restrictions, etc.)
+      return input;
+    },
     handleSubmit() {
-      const requiredFields = [//set all required fields
+      const requiredFields = [
         "streetName",
         "description",
         "houseNumber",
@@ -77,47 +79,46 @@ export default {
         "hasGarage",
       ];
       let hasError = false;
-
       // Check if all required fields are filled
       for (const field of requiredFields) {
-        if (!this.newPost[field]) {
+        const value = this.newPost[field];
+
+        if (!value) {
           hasError = true;
           const input = this.$refs[field];
           input.classList.add("error");
         } else {
           const input = this.$refs[field];
           input.classList.remove("error");
+          this.newPost[field] = this.validateInput(value); // Validate and sanitize the input
         }
       }
 
-      // Check if an image is selected
-      if (!this.image) {
+      if (!this.image) {// Check if an image is selected
         alert("Please select an image");
         return;
       }
 
-      // If there are errors, show the error message and return
-      if (hasError) {
+      if (hasError) {// Check if there are any errors
         this.showError = true;
         return;
       }
-
-      // If there are no errors, submit the form
+      // Create a new post
       const postStore = usePostStore();
-      postStore.postHouses(this.newPost, this.image)
+      postStore
+        .postHouses(this.newPost, this.image)
         .then(({ id }) => {
-          // Reload the page after the navigation
           location.reload();
-          // Redirect to the detail page
           window.location.href = `/detail/${id}`;
         })
         .catch((error) => {
           console.error(error);
         });
-    }
+    },
   },
 };
 </script>
+
 
 <template>
   <div class="bg">

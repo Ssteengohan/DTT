@@ -103,7 +103,7 @@ export default {
             <img :src="house.image" alt="" class="houseImg" />
           </div>
           <div class="PostDetail">
-            <h3 class="street">{{ house.location.street }}</h3>
+            <h3 class="street">{{ house.location.street }} {{ house.location.houseNumber }}</h3>
             <p class="housePrice">€ {{ house.price }}</p>
             <p class="ZipCode">
               {{ house.location.zip }} {{ house.location.city }}
